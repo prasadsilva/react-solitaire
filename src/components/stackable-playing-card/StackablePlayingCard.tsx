@@ -3,8 +3,8 @@ import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/utils/constants';
 import { PlayingCardsHooks } from '@/utils/game-context';
 import { OPlayingCardStackBehavior, type PlayingCanvasPosition } from '@/utils/types';
 import { useMemo } from 'react';
-import type { PlayingCardProps } from '.';
 import { PlayingCardHolder } from './StackablePlayingCardHolder';
+import type { PlayingCardProps } from './types';
 
 export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
   const { draggableRef, isBeingDragged, currentPosition } = PlayingCardsHooks.useDraggable(stackInfo, position);

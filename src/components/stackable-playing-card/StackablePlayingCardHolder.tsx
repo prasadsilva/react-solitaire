@@ -1,8 +1,8 @@
 import { PlayingCardDropTarget } from '@/components/drop-target/PlayingCardDropTarget';
 import { LAYOUT_CONSTANTS } from '@/utils/constants';
 import { useMemo } from 'react';
-import type { PlayingCardProps } from '.';
 import { PlayingCard } from './StackablePlayingCard';
+import type { PlayingCardProps } from './types';
 
 export function PlayingCardHolder({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
   const droptargetStackInfo = useMemo(() => ({ ...stackInfo, cardIndex: cardStack.cards.length }), [cardStack.cards]);
