@@ -1,1 +1,1 @@
-# react-solitaire
+# React Solitaire
