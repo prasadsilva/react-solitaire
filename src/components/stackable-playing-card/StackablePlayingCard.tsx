@@ -1,18 +1,10 @@
-import { useMemo, type ComponentProps } from 'react';
-import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackInfo } from '@/utils/types';
-import { PlayingCardsHooks } from '@/utils/game-context';
-import type { Immutable } from '@/lib';
-import { PlayingCardDropTarget } from './PlayingCardDropTarget';
-import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/utils/constants';
 import { cn } from '@/lib/utils';
-
-export type PlayingCardProps = Immutable<{
-  cardStack: PlayingCardStackData;
-  stackInfo: PlayingCardStackInfo;
-  position: PlayingCanvasPosition;
-  isPreviousSiblingBeingDragged?: boolean;
-}> &
-  ComponentProps<'div'>;
+import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/utils/constants';
+import { PlayingCardsHooks } from '@/utils/game-context';
+import { OPlayingCardStackBehavior, type PlayingCanvasPosition } from '@/utils/types';
+import { useMemo } from 'react';
+import type { PlayingCardProps } from '.';
+import { PlayingCardHolder } from './StackablePlayingCardHolder';
 
 export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
   const { draggableRef, isBeingDragged, currentPosition } = PlayingCardsHooks.useDraggable(stackInfo, position);
@@ -52,27 +44,5 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
         isPreviousSiblingBeingDragged={isInDraggedState}
       />
     </>
-  );
-}
-
-export function PlayingCardHolder({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
-  const droptargetStackInfo = useMemo(() => ({ ...stackInfo, cardIndex: cardStack.cards.length }), [cardStack.cards]);
-  const droptargetPosition = useMemo(
-    () => ({
-      x: cardStack.position.x,
-      y: cardStack.position.y + cardStack.cards.length * LAYOUT_CONSTANTS.STACKED_CARD_Y_OFFSET,
-    }),
-    [cardStack.position, cardStack.cards],
-  );
-  return stackInfo.cardIndex < cardStack.cards.length ? (
-    <PlayingCard
-      {...props}
-      cardStack={cardStack}
-      stackInfo={stackInfo}
-      position={position}
-      isPreviousSiblingBeingDragged={isPreviousSiblingBeingDragged}
-    />
-  ) : (
-    cardStack.hasDropTarget && <PlayingCardDropTarget stackInfo={droptargetStackInfo} position={droptargetPosition} />
   );
 }
