@@ -1,7 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackInfo } from './types';
+import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackInfo } from '@/data/types';
 import type { Immutable } from '@/lib';
 import { deepFreeze } from '@/lib/utils';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { DragManager } from './dragmanager';
 
 type PlayingCardsContextChangeListener = (modelChanged: boolean) => void;

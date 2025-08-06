@@ -1,5 +1,5 @@
 import { Card2C, Card4D, CardAH, CardKS } from '@/data/card-svgs';
-import { LAYOUT_CONSTANTS } from '@/utils/constants';
+import { LAYOUT_CONSTANTS } from '@/data/constants';
 import { OPlayingCardStackBehavior, OSuit, type PlayingCardStackData } from './types';
 
 export const initialCardStacks: PlayingCardStackData[] = [

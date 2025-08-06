@@ -1,7 +1,7 @@
 import { PlayingCardsCanvas } from '@/components/playing-canvas';
 import { ThemeProvider, ThemeToggle } from '@/components/theme';
 import { Button } from '@/components/ui/button';
-import { initialCardStacks } from './utils/data';
+import { initialCardStacks } from '@/data/initial-data';
 import { createNewPlayingCardsContextValue, PlayingCardsContext } from './utils/game-context';
 
 function SolitaireGame() {

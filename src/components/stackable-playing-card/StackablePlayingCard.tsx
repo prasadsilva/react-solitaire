@@ -1,7 +1,7 @@
+import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/data/constants';
+import { OPlayingCardStackBehavior, type PlayingCanvasPosition } from '@/data/types';
 import { cn } from '@/lib/utils';
-import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/utils/constants';
 import { PlayingCardsHooks } from '@/utils/game-context';
-import { OPlayingCardStackBehavior, type PlayingCanvasPosition } from '@/utils/types';
 import { useMemo } from 'react';
 import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
 import type { PlayingCardProps } from './types';

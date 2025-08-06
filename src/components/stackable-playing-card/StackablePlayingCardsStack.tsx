@@ -1,6 +1,6 @@
 import CardOutline from '@/assets/outline.svg?react';
+import { CARD_DIMS_CLASS } from '@/data/constants';
 import { cn } from '@/lib/utils';
-import { CARD_DIMS_CLASS } from '@/utils/constants';
 import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
 import type { PlayingCardsStackProps } from './types';
 

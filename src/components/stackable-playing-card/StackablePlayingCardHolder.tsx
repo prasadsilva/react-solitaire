@@ -1,5 +1,5 @@
 import { StackablePlayingCardDropTarget } from '@/components/stackable-playing-card/StackablePlayingCardDropTarget';
-import { LAYOUT_CONSTANTS } from '@/utils/constants';
+import { LAYOUT_CONSTANTS } from '@/data/constants';
 import { useMemo } from 'react';
 import { StackablePlayingCard } from './StackablePlayingCard';
 import type { PlayingCardProps } from './types';
