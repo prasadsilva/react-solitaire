@@ -1,7 +1,4 @@
-import Card2C from '@/assets/2C.svg';
-import Card2D from '@/assets/2D.svg';
-import Card2H from '@/assets/2H.svg';
-import Card2S from '@/assets/2S.svg';
+import { Card2C, Card4D, CardAH, CardKS } from '@/data/card-svgs';
 import { LAYOUT_CONSTANTS } from '@/utils/constants';
 import { OPlayingCardStackBehavior, OSuit, type PlayingCardStackData } from './types';
 
@@ -9,20 +6,20 @@ export const initialCardStacks: PlayingCardStackData[] = [
   {
     cards: [
       { suit: OSuit.Clubs, rank: 1, cardImg: Card2C },
-      { suit: OSuit.Diamonds, rank: 1, cardImg: Card2D },
+      { suit: OSuit.Diamonds, rank: 1, cardImg: Card4D },
     ],
     behavior: OPlayingCardStackBehavior.MoveAllNextSiblings,
     hasDropTarget: true,
     position: { x: 20, y: LAYOUT_CONSTANTS.TOP_ROW_Y },
   },
   {
-    cards: [{ suit: OSuit.Spades, rank: 1, cardImg: Card2S }],
+    cards: [{ suit: OSuit.Spades, rank: 1, cardImg: CardKS }],
     behavior: OPlayingCardStackBehavior.MoveAllNextSiblings,
     hasDropTarget: true,
     position: { x: 130, y: LAYOUT_CONSTANTS.TOP_ROW_Y },
   },
   {
-    cards: [{ suit: OSuit.Hearts, rank: 1, cardImg: Card2H }],
+    cards: [{ suit: OSuit.Hearts, rank: 1, cardImg: CardAH }],
     behavior: OPlayingCardStackBehavior.MoveAllNextSiblings,
     hasDropTarget: true,
     position: { x: 240, y: LAYOUT_CONSTANTS.TOP_ROW_Y },
