@@ -6,9 +6,7 @@ interface DropTargetData<T> {
 }
 
 export class DragManager<T> {
-  private trackedObjDragMoveCallback:
-    | ((canvasDeltaX: number, canvasDeltaY: number) => void)
-    | undefined;
+  private trackedObjDragMoveCallback: ((canvasDeltaX: number, canvasDeltaY: number) => void) | undefined;
   private trackedObjDragEndCallback: (() => void) | undefined;
   private canvasPointerClientX: number;
   private canvasPointerClientY: number;
@@ -43,9 +41,7 @@ export class DragManager<T> {
 
   private setDragData(dragData: T | null) {
     this.currentDragData = dragData;
-    this.dragStateChangeListeners.forEach((callback) =>
-      callback(this.currentDragData),
-    );
+    this.dragStateChangeListeners.forEach((callback) => callback(this.currentDragData));
   }
 
   public setCanvasElement(canvas: HTMLElement | null) {
@@ -70,12 +66,7 @@ export class DragManager<T> {
     return this.canvasElement;
   }
 
-  public registerDropTarget(
-    element: HTMLElement,
-    data: T,
-    onEnter?: (data: T) => void,
-    onLeave?: (data: T) => void,
-  ) {
+  public registerDropTarget(element: HTMLElement, data: T, onEnter?: (data: T) => void, onLeave?: (data: T) => void) {
     this.dropTargetRegistry.set(element, { element, data, onEnter, onLeave });
   }
 
@@ -104,10 +95,7 @@ export class DragManager<T> {
     this.currentDropTarget = null;
   }
 
-  private findDropTargetAtPoint(
-    x: number,
-    y: number,
-  ): DropTargetData<T> | null {
+  private findDropTargetAtPoint(x: number, y: number): DropTargetData<T> | null {
     const elementAtPoint = document.elementFromPoint(x, y);
     if (!elementAtPoint) return null;
 
@@ -140,10 +128,7 @@ export class DragManager<T> {
 
     // Only check for drop targets during an active drag
     if (this.currentDragData) {
-      const dropTargetAtPoint = this.findDropTargetAtPoint(
-        e.clientX,
-        e.clientY,
-      );
+      const dropTargetAtPoint = this.findDropTargetAtPoint(e.clientX, e.clientY);
 
       if (dropTargetAtPoint !== this.currentDropTarget) {
         if (this.currentDropTarget) {
@@ -158,34 +143,16 @@ export class DragManager<T> {
 
   private registerPointerReleaseCallbacks = () => {
     document.body.addEventListener('pointermove', this.trackCanvasPointer);
-    document.body.addEventListener(
-      'pointerup',
-      this.handlePointerReleaseNative,
-    );
-    document.body.addEventListener(
-      'pointerleave',
-      this.handlePointerInvalidNative,
-    );
-    document.body.addEventListener(
-      'pointercancel',
-      this.handlePointerInvalidNative,
-    );
+    document.body.addEventListener('pointerup', this.handlePointerReleaseNative);
+    document.body.addEventListener('pointerleave', this.handlePointerInvalidNative);
+    document.body.addEventListener('pointercancel', this.handlePointerInvalidNative);
   };
 
   private unregisterPointerReleaseCallbacks = () => {
     document.body.removeEventListener('pointermove', this.trackCanvasPointer);
-    document.body.removeEventListener(
-      'pointerup',
-      this.handlePointerReleaseNative,
-    );
-    document.body.removeEventListener(
-      'pointerleave',
-      this.handlePointerInvalidNative,
-    );
-    document.body.removeEventListener(
-      'pointercancel',
-      this.handlePointerInvalidNative,
-    );
+    document.body.removeEventListener('pointerup', this.handlePointerReleaseNative);
+    document.body.removeEventListener('pointerleave', this.handlePointerInvalidNative);
+    document.body.removeEventListener('pointercancel', this.handlePointerInvalidNative);
   };
 
   private handlePointerReleaseNative = () => {
@@ -235,9 +202,7 @@ export class DragManager<T> {
   public clearActiveDragHandler = () => {
     // Not dragging - bail
     if (!this.trackedObjDragMoveCallback) {
-      console.warn(
-        'Unable to clear drag object. Not currently dragging an element.',
-      );
+      console.warn('Unable to clear drag object. Not currently dragging an element.');
       return;
     }
 
