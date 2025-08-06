@@ -5,3 +5,9 @@ export type PlayingCardProps = Immutable<{
   isPreviousSiblingBeingDragged?: boolean;
 }> &
   ComponentProps<'div'>;
+
+export type PlayingCardsStackProps = Immutable<{
+  cardStack: PlayingCardStackData;
+  stackIndex: number;
+}> &
+  ComponentProps<'div'>;

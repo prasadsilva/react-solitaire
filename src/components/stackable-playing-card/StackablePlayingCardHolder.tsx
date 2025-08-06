@@ -1,10 +1,10 @@
-import { PlayingCardDropTarget } from '@/components/drop-target/PlayingCardDropTarget';
+import { StackablePlayingCardDropTarget } from '@/components/stackable-playing-card/StackablePlayingCardDropTarget';
 import { LAYOUT_CONSTANTS } from '@/utils/constants';
 import { useMemo } from 'react';
-import { PlayingCard } from './StackablePlayingCard';
+import { StackablePlayingCard } from './StackablePlayingCard';
 import type { PlayingCardProps } from './types';
 
-export function PlayingCardHolder({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
+export function StackablePlayingCardHolder({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
   const droptargetStackInfo = useMemo(() => ({ ...stackInfo, cardIndex: cardStack.cards.length }), [cardStack.cards]);
   const droptargetPosition = useMemo(
     () => ({
@@ -13,8 +13,9 @@ export function PlayingCardHolder({ cardStack, stackInfo, position, isPreviousSi
     }),
     [cardStack.position, cardStack.cards],
   );
+
   return stackInfo.cardIndex < cardStack.cards.length ? (
-    <PlayingCard
+    <StackablePlayingCard
       {...props}
       cardStack={cardStack}
       stackInfo={stackInfo}
@@ -22,6 +23,6 @@ export function PlayingCardHolder({ cardStack, stackInfo, position, isPreviousSi
       isPreviousSiblingBeingDragged={isPreviousSiblingBeingDragged}
     />
   ) : (
-    cardStack.hasDropTarget && <PlayingCardDropTarget stackInfo={droptargetStackInfo} position={droptargetPosition} />
+    cardStack.hasDropTarget && <StackablePlayingCardDropTarget stackInfo={droptargetStackInfo} position={droptargetPosition} />
   );
 }

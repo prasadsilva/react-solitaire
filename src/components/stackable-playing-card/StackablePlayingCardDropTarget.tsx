@@ -11,7 +11,7 @@ export type PlayingCardDropTargetProps = Immutable<{
   position: PlayingCanvasPosition;
 }> &
   ComponentProps<'div'>;
-export function PlayingCardDropTarget({ stackInfo, position, ...props }: PlayingCardDropTargetProps) {
+export function StackablePlayingCardDropTarget({ stackInfo, position, ...props }: PlayingCardDropTargetProps) {
   const { dropTargetRef, isActivated, isDragOver } = PlayingCardsHooks.useDropTarget(stackInfo);
 
   return (

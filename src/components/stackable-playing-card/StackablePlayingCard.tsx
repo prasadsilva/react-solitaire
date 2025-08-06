@@ -3,10 +3,10 @@ import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/utils/constants';
 import { PlayingCardsHooks } from '@/utils/game-context';
 import { OPlayingCardStackBehavior, type PlayingCanvasPosition } from '@/utils/types';
 import { useMemo } from 'react';
-import { PlayingCardHolder } from './StackablePlayingCardHolder';
+import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
 import type { PlayingCardProps } from './types';
 
-export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
+export function StackablePlayingCard({ cardStack, stackInfo, position, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
   const { draggableRef, isBeingDragged, currentPosition } = PlayingCardsHooks.useDraggable(stackInfo, position);
 
   // TODO: These could be moved into the hook?
@@ -37,7 +37,7 @@ export function PlayingCard({ cardStack, stackInfo, position, isPreviousSiblingB
       >
         <img src={cardStack.cards[stackInfo.cardIndex].cardImg} className={cn('', CARD_DIMS_CLASS)} draggable={false} />
       </div>
-      <PlayingCardHolder
+      <StackablePlayingCardHolder
         cardStack={cardStack}
         stackInfo={{ ...stackInfo, cardIndex: stackInfo.cardIndex + 1 }}
         position={nextSiblingPosition}

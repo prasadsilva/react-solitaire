@@ -1,9 +1,9 @@
-import { OPlayingCardStackBehavior, OSuit, type PlayingCardStackData } from './types';
-import Card2C from '@/img/playing-cards/2C.svg';
-import Card2D from '@/img/playing-cards/2D.svg';
-import Card2H from '@/img/playing-cards/2H.svg';
-import Card2S from '@/img/playing-cards/2S.svg';
+import Card2C from '@/assets/2C.svg';
+import Card2D from '@/assets/2D.svg';
+import Card2H from '@/assets/2H.svg';
+import Card2S from '@/assets/2S.svg';
 import { LAYOUT_CONSTANTS } from '@/utils/constants';
+import { OPlayingCardStackBehavior, OSuit, type PlayingCardStackData } from './types';
 
 export const initialCardStacks: PlayingCardStackData[] = [
   {
