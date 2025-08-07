@@ -68,6 +68,7 @@ export const CardJC: PlayingCardDescriptor = { suit: OSuit.Clubs, rank: 10, card
 export const CardQC: PlayingCardDescriptor = { suit: OSuit.Clubs, rank: 11, cardImg: CardQCSvg };
 export const CardKC: PlayingCardDescriptor = { suit: OSuit.Clubs, rank: 12, cardImg: CardKCSvg };
 export const CardAC: PlayingCardDescriptor = { suit: OSuit.Clubs, rank: 13, cardImg: CardACSvg };
+export const AllCardsC = [Card2C, Card3C, Card4C, Card5C, Card6C, Card7C, Card8C, Card9C, CardTC, CardJC, CardQC, CardKC, CardAC];
 
 // Diamonds
 export const Card2D: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 1, cardImg: Card2DSvg };
@@ -83,6 +84,7 @@ export const CardJD: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 10, c
 export const CardQD: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 11, cardImg: CardQDSvg };
 export const CardKD: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 12, cardImg: CardKDSvg };
 export const CardAD: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 13, cardImg: CardADSvg };
+export const AllCardsD = [Card2D, Card3D, Card4D, Card5D, Card6D, Card7D, Card8D, Card9D, CardTD, CardJD, CardQD, CardKD, CardAD];
 
 // Hearts
 export const Card2H: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 1, cardImg: Card2HSvg };
@@ -98,6 +100,7 @@ export const CardJH: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 10, c
 export const CardQH: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 11, cardImg: CardQHSvg };
 export const CardKH: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 12, cardImg: CardKHSvg };
 export const CardAH: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 13, cardImg: CardAHSvg };
+export const AllCardsH = [Card2H, Card3H, Card4H, Card5H, Card6H, Card7H, Card8H, Card9H, CardTH, CardJH, CardQH, CardKH, CardAH];
 
 // Spades
 export const Card2S: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 1, cardImg: Card2SSvg };
@@ -113,3 +116,4 @@ export const CardJS: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 10, c
 export const CardQS: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 11, cardImg: CardQSSvg };
 export const CardKS: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 12, cardImg: CardKSSvg };
 export const CardAS: PlayingCardDescriptor = { suit: OSuit.Diamonds, rank: 13, cardImg: CardASSvg };
+export const AllCardsS = [Card2S, Card3S, Card4S, Card5S, Card6S, Card7S, Card8S, Card9S, CardTS, CardJS, CardQS, CardKS, CardAS];

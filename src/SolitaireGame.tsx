@@ -1,8 +1,9 @@
-import { PlayingCardsCanvas } from '@/components/playing-canvas';
+import { PlayingCardsCanvas } from '@/components/solitaire-game/SolitaireCanvas';
 import { ThemeProvider, ThemeToggle } from '@/components/theme';
 import { Button } from '@/components/ui/button';
 import { initialCardStacks } from '@/data/initial-data';
 import { createNewPlayingCardsContextValue, PlayingCardsContext } from './utils/game-context';
+import { createNewSolitaireContextValue, SolitaireContext } from './utils/solitaire-context';
 
 function SolitaireGame() {
   return (
@@ -14,9 +15,11 @@ function SolitaireGame() {
           <ThemeToggle />
         </div>
         <div className="flex-2">
-          <PlayingCardsContext value={createNewPlayingCardsContextValue(initialCardStacks)}>
-            <PlayingCardsCanvas />
-          </PlayingCardsContext>
+          <SolitaireContext value={createNewSolitaireContextValue()}>
+            <PlayingCardsContext value={createNewPlayingCardsContextValue(initialCardStacks)}>
+              <PlayingCardsCanvas />
+            </PlayingCardsContext>
+          </SolitaireContext>
         </div>
       </div>
     </ThemeProvider>
