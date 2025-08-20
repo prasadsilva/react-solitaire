@@ -1,14 +1,18 @@
 import type { PlayingCardDescriptor } from '@/data/types';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { generateNewSolitaireDeck } from './deck-builder';
+
+type SolitaireContextChangeListener = (modelChanged: boolean) => void;
 
 class SolitaireData {
   private drawPile: PlayingCardDescriptor[];
   private discardPile: PlayingCardDescriptor[];
+  private changeListeners: Set<SolitaireContextChangeListener>;
 
   public constructor() {
     this.drawPile = generateNewSolitaireDeck();
     this.discardPile = [];
+    this.changeListeners = new Set();
   }
 
   public getDrawPile() {
@@ -17,6 +21,40 @@ class SolitaireData {
 
   public getDiscardPile() {
     return this.discardPile;
+  }
+
+  drawCards() {
+    if (this.drawPile.length > 0) {
+      const drawnCards = this.drawPile.slice(0, 3);
+      drawnCards.reverse();
+      this.drawPile = this.drawPile.slice(3);
+      this.discardPile = [...drawnCards, ...this.discardPile];
+      console.log(`draw pile count: ${this.drawPile.length}`);
+      console.log(`discard pile count: ${this.discardPile.length}`);
+      this.notifyContextStateChange(true);
+    } else {
+      this.notifyContextStateChange(false);
+    }
+  }
+
+  resetDrawPile() {
+    if (this.drawPile.length === 0 && this.discardPile.length > 0) {
+      this.drawPile = this.discardPile;
+      this.discardPile = [];
+      this.notifyContextStateChange(true);
+    } else {
+      this.notifyContextStateChange(false);
+    }
+  }
+
+  public addChangeListener(callback: SolitaireContextChangeListener) {
+    this.changeListeners.add(callback);
+  }
+  public removeChangeListener(callback: SolitaireContextChangeListener) {
+    this.changeListeners.delete(callback);
+  }
+  private notifyContextStateChange(modelChanged: boolean) {
+    this.changeListeners.forEach((callback) => callback(modelChanged));
   }
 }
 
@@ -28,15 +66,38 @@ function useDrawPile() {
   if (!context) {
     throw new Error('useDrawPile must be used within a SolitaireContext');
   }
-  const drawPileCount = useMemo(() => context.getDrawPile().length, [context.getDrawPile()]);
+  const [drawPile, setDrawPile] = useState(context.getDrawPile());
+  const drawPileCount = useMemo(() => drawPile.length, [drawPile]);
+
+  const handleContextChange = useCallback(
+    (modelChanged: boolean) => {
+      if (modelChanged) {
+        setDrawPile(context.getDrawPile());
+      } else {
+        // We are here because of an aborted action. Reset the state to cause a re-render
+        setDrawPile([...context.getDrawPile()]);
+      }
+    },
+    [context],
+  );
+
+  useEffect(() => {
+    context.addChangeListener(handleContextChange);
+    return () => context.removeChangeListener(handleContextChange);
+  }, [context]);
 
   const doDrawCards = useCallback(() => {
-    console.log('TODO - drawCards called');
-  }, []);
+    context.drawCards();
+  }, [context]);
+
+  const doResetDrawPile = useCallback(() => {
+    context.resetDrawPile();
+  }, [context]);
 
   return {
     drawPileCount,
     doDrawCards,
+    doResetDrawPile,
   };
 }
 
@@ -45,15 +106,32 @@ function useDiscardPile() {
   if (!context) {
     throw new Error('useDiscardPile must be used within a SolitaireContext');
   }
-  const discardPileCount = useMemo(() => context.getDiscardPile().length, [context.getDiscardPile()]);
-  const topCard = useMemo(
-    () => (context.getDiscardPile().length > 0 ? context.getDiscardPile()[context.getDiscardPile().length - 1] : null),
-    [context.getDiscardPile()],
+  const [discardPile, setDiscardPile] = useState(context.getDiscardPile());
+  const discardPileCount = useMemo(() => discardPile.length, [discardPile]);
+  const topCard = useMemo(() => (discardPile.length > 0 ? discardPile[discardPile.length - 1] : null), [discardPile]);
+  const nextCard = useMemo(() => (discardPile.length > 1 ? discardPile[discardPile.length - 2] : null), [discardPile]);
+
+  const handleContextChange = useCallback(
+    (modelChanged: boolean) => {
+      if (modelChanged) {
+        setDiscardPile(context.getDiscardPile());
+      } else {
+        // We are here because of an aborted action. Reset the state to cause a re-render
+        setDiscardPile([...context.getDiscardPile()]);
+      }
+    },
+    [context],
   );
+
+  useEffect(() => {
+    context.addChangeListener(handleContextChange);
+    return () => context.removeChangeListener(handleContextChange);
+  }, [context]);
 
   return {
     discardPileCount,
     topCard,
+    nextCard,
   };
 }
 
