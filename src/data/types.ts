@@ -44,4 +44,6 @@ export interface PlayingCardStackData {
   behavior: PlayingCardStackBehavior;
   hasDropTarget: boolean;
   position: PlayingCanvasPosition;
+  stackedCardOffsetX: number;
+  stackedCardOffsetY: number;
 }

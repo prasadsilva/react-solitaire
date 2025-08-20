@@ -21,8 +21,8 @@ export function StackablePlayingCard({ cardStack, stackInfo, position, isPreviou
   const positionForSiblingLayout = cardStack.behavior === OPlayingCardStackBehavior.MoveAllNextSiblings ? currentPosition : position;
   const nextSiblingPosition = useMemo<PlayingCanvasPosition>(
     () => ({
-      x: positionForSiblingLayout.x,
-      y: positionForSiblingLayout.y + LAYOUT_CONSTANTS.STACKED_CARD_Y_OFFSET,
+      x: positionForSiblingLayout.x + cardStack.stackedCardOffsetX,
+      y: positionForSiblingLayout.y + cardStack.stackedCardOffsetY,
     }),
     [positionForSiblingLayout],
   );

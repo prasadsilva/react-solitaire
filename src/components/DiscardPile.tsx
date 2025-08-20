@@ -1,3 +1,4 @@
+import { LAYOUT_CONSTANTS } from '@/data/constants';
 import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCardStackData } from '@/data/types';
 import type { Immutable } from '@/lib';
 import { SolitaireContextHooks } from '@/utils/solitaire-context';
@@ -16,6 +17,8 @@ export function DiscardPile({ position, ...props }: DiscardPilePileProps) {
     position,
     hasDropTarget: false,
     behavior: OPlayingCardStackBehavior.MoveOnlyTop,
+    stackedCardOffsetX: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_XOFFSET,
+    stackedCardOffsetY: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_YOFFSET,
   });
 
   useEffect(() => {
@@ -31,6 +34,8 @@ export function DiscardPile({ position, ...props }: DiscardPilePileProps) {
       position,
       hasDropTarget: false,
       behavior: OPlayingCardStackBehavior.MoveOnlyTop,
+      stackedCardOffsetX: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_XOFFSET,
+      stackedCardOffsetY: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_YOFFSET,
     });
   }, [topCard, nextCard]);
 
