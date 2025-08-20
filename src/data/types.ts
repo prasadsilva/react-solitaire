@@ -32,6 +32,7 @@ export interface PlayingCardStackInfo {
 export const OPlayingCardStackBehavior = {
   MoveIndividually: 0,
   MoveAllNextSiblings: 1,
+  MoveOnlyTop: 2,
 } as const;
 export type PlayingCardStackBehavior = (typeof OPlayingCardStackBehavior)[keyof typeof OPlayingCardStackBehavior];
 // Usage:

@@ -26,9 +26,8 @@ class SolitaireData {
   drawCards() {
     if (this.drawPile.length > 0) {
       const drawnCards = this.drawPile.slice(0, 3);
-      drawnCards.reverse();
       this.drawPile = this.drawPile.slice(3);
-      this.discardPile = [...drawnCards, ...this.discardPile];
+      this.discardPile = [...this.discardPile, ...drawnCards];
       console.log(`draw pile count: ${this.drawPile.length}`);
       console.log(`discard pile count: ${this.discardPile.length}`);
       this.notifyContextStateChange(true);

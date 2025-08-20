@@ -10,6 +10,10 @@ export function StackablePlayingCard({ cardStack, stackInfo, position, isPreviou
   const { draggableRef, isBeingDragged, currentPosition } = PlayingCardsHooks.useDraggable(stackInfo, position);
 
   // TODO: These could be moved into the hook?
+  const isDraggable = useMemo(
+    () => cardStack.behavior !== OPlayingCardStackBehavior.MoveOnlyTop || stackInfo.cardIndex === cardStack.cards.length - 1,
+    [],
+  );
   const isInDraggedState = useMemo(
     () => (cardStack.behavior === OPlayingCardStackBehavior.MoveAllNextSiblings && isPreviousSiblingBeingDragged) || isBeingDragged,
     [isPreviousSiblingBeingDragged, isBeingDragged],
@@ -32,7 +36,7 @@ export function StackablePlayingCard({ cardStack, stackInfo, position, isPreviou
         style={{
           transform: `translateX(${currentPosition.x}px) translateY(${currentPosition.y}px)`,
           zIndex: isInDraggedState ? stackInfo.cardIndex + LAYOUT_CONSTANTS.DRAG_Z_INDEX_OFFSET : stackInfo.cardIndex,
-          pointerEvents: isInDraggedState ? 'none' : 'auto',
+          pointerEvents: !isDraggable || isInDraggedState ? 'none' : 'auto',
         }}
       >
         <img src={cardStack.cards[stackInfo.cardIndex].cardImg} className={cn('', CARD_DIMS_CLASS)} draggable={false} />
