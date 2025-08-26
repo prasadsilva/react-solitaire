@@ -25,7 +25,7 @@ export interface PlayingCanvasPosition {
 }
 
 export interface PlayingCardStackInfo {
-  stackId: number;
+  stackId: string;
   cardIndex: number;
 }
 
@@ -49,20 +49,39 @@ export type PlayingCardStackDropBehavior = (typeof OPlayingCardStackDropBehavior
 // function foo(param: StackBehavior) { ... }
 // const someVar = {..., enumValue: OStackBehavior, ... }
 
+export const OSolitaireFoundationStack = {
+  Foundation1: 'foundation1',
+  Foundation2: 'foundation2',
+  Foundation3: 'foundation3',
+  Foundation4: 'foundation4',
+};
+export type SolitaireFoundationStack = (typeof OSolitaireFoundationStack)[keyof typeof OSolitaireFoundationStack];
+
+export const OSolitaireTableauStack = {
+  Tableau1: 'tableau1',
+  Tableau2: 'tableau2',
+  Tableau3: 'tableau3',
+  Tableau4: 'tableau4',
+  Tableau5: 'tableau5',
+  Tableau6: 'tableau6',
+  Tableau7: 'tableau7',
+};
+export type SolitaireTableauStack = (typeof OSolitaireTableauStack)[keyof typeof OSolitaireTableauStack];
+
 export const OSolitaireCardStack = {
-  Stock: 0,
-  Talon: 1,
-  Foundation1: 2,
-  Foundation2: 3,
-  Foundation3: 4,
-  Foundation4: 5,
-  Tableau1: 6,
-  Tableau2: 7,
-  Tableau3: 8,
-  Tableau4: 9,
-  Tableau5: 10,
-  Tableau6: 11,
-  Tableau7: 12,
+  Stock: 'stock',
+  Talon: 'talon',
+  Foundation1: OSolitaireFoundationStack.Foundation1,
+  Foundation2: OSolitaireFoundationStack.Foundation2,
+  Foundation3: OSolitaireFoundationStack.Foundation3,
+  Foundation4: OSolitaireFoundationStack.Foundation4,
+  Tableau1: OSolitaireTableauStack.Tableau1,
+  Tableau2: OSolitaireTableauStack.Tableau2,
+  Tableau3: OSolitaireTableauStack.Tableau3,
+  Tableau4: OSolitaireTableauStack.Tableau4,
+  Tableau5: OSolitaireTableauStack.Tableau5,
+  Tableau6: OSolitaireTableauStack.Tableau6,
+  Tableau7: OSolitaireTableauStack.Tableau7,
 };
 export type SolitaireCardStack = (typeof OSolitaireCardStack)[keyof typeof OSolitaireCardStack];
 // Usage:

@@ -7,6 +7,7 @@ import {
   type PlayingCardStackData,
   type PlayingCardStackDropBehavior,
   type SolitaireCardStack,
+  type SolitaireTableauStack,
 } from '@/data/types';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { generateNewSolitaireDeck } from './deck-builder';
@@ -106,6 +107,10 @@ class SolitaireData {
 
   public getTalon() {
     return this.cardStacks[OSolitaireCardStack.Talon];
+  }
+
+  public getStack(stackId: SolitaireCardStack) {
+    return this.cardStacks[stackId];
   }
 
   drawCards() {
@@ -226,7 +231,39 @@ function useTalon() {
   };
 }
 
+function useTableau(id: SolitaireTableauStack) {
+  const context = useContext(SolitaireContext);
+  if (!context) {
+    throw new Error('useDiscardPile must be used within a SolitaireContext');
+  }
+  const tableauMeta = useMemo(() => context.getStack(id).meta, [context]);
+  const [tableauCards, setTableauCards] = useState(context.getStack(id).cards);
+
+  const handleContextChange = useCallback(
+    (modelChanged: boolean) => {
+      if (modelChanged) {
+        setTableauCards(context.getStack(id).cards);
+      } else {
+        // We are here because of an aborted action. Reset the state to cause a re-render
+        setTableauCards([...context.getStack(id).cards]);
+      }
+    },
+    [context],
+  );
+
+  useEffect(() => {
+    context.addChangeListener(handleContextChange);
+    return () => context.removeChangeListener(handleContextChange);
+  }, [context]);
+
+  return {
+    tableauMeta,
+    tableauCards,
+  };
+}
+
 export const SolitaireContextHooks = {
   useStock,
   useTalon,
+  useTableau,
 };
