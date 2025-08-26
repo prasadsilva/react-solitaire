@@ -1,18 +1,15 @@
-import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackInfo } from '@/data/types';
+import { type PlayingCanvasPosition, type PlayingCardStackInfo } from '@/data/types';
 import type { Immutable } from '@/lib';
-import { deepFreeze } from '@/lib/utils';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { DragManager } from './dragmanager';
 
-type PlayingCardsContextChangeListener = (modelChanged: boolean) => void;
+type PlayingCardsCanvasContextChangeListener = (modelChanged: boolean) => void;
 
-class PlayingCardsContextData {
-  private cardStacks: Immutable<PlayingCardStackData[]>;
-  private changeListeners: Set<PlayingCardsContextChangeListener>;
+class PlayingCardsCanvasContextData {
+  private changeListeners: Set<PlayingCardsCanvasContextChangeListener>;
   private dragManager: DragManager<PlayingCardStackInfo>;
 
-  public constructor(cardStacksParam: PlayingCardStackData[]) {
-    this.cardStacks = deepFreeze(cardStacksParam);
+  public constructor() {
     this.changeListeners = new Set();
     this.dragManager = new DragManager((card) => this.tryHandleDrop(card));
   }
@@ -20,7 +17,6 @@ class PlayingCardsContextData {
   public cleanup() {
     // Clean up canvas reference and any listeners
     this.dragManager.setCanvasElement(null);
-    this.changeListeners.clear();
   }
 
   public getCanvasElement() {
@@ -29,10 +25,6 @@ class PlayingCardsContextData {
 
   public setCanvasElement(canvas: HTMLElement | null) {
     this.dragManager.setCanvasElement(canvas);
-  }
-
-  public getCardStacks() {
-    return this.cardStacks;
   }
 
   public setActiveDragHandler(
@@ -62,121 +54,91 @@ class PlayingCardsContextData {
   private tryHandleDrop(stackInfo: PlayingCardStackInfo) {
     const currentDropTarget = this.dragManager.getCurrentDropTarget();
     if (currentDropTarget) {
-      this.moveBetweenStacks(stackInfo, currentDropTarget);
-      this.notifyContextStateChange(true);
+      // TODO:
+      // this.notifyValidDrop();
     } else {
-      this.notifyContextStateChange(false);
+      // TODO:
+      // this.notifyInvalidDrop();
     }
   }
 
-  public addChangeListener(callback: PlayingCardsContextChangeListener) {
+  public addChangeListener(callback: PlayingCardsCanvasContextChangeListener) {
     this.changeListeners.add(callback);
   }
-  public removeChangeListener(callback: PlayingCardsContextChangeListener) {
+  public removeChangeListener(callback: PlayingCardsCanvasContextChangeListener) {
     this.changeListeners.delete(callback);
   }
   private notifyContextStateChange(modelChanged: boolean) {
     this.changeListeners.forEach((callback) => callback(modelChanged));
   }
+  // private moveBetweenStacks(sourceStackInfo: PlayingCardStackInfo, targetStackInfo: PlayingCardStackInfo) {
+  //   const sourceStackIdx = sourceStackInfo.stackIndex;
+  //   if (sourceStackIdx === -1) {
+  //     console.warn('Unable to move card. Source stack is invalid');
+  //     return;
+  //   }
+  //   const targetStackIdx = targetStackInfo.stackIndex;
+  //   if (targetStackIdx === -1) {
+  //     console.warn('Unable to move card. Target stack is invalid');
+  //     return;
+  //   }
 
-  private moveBetweenStacks(sourceStackInfo: PlayingCardStackInfo, targetStackInfo: PlayingCardStackInfo) {
-    const sourceStackIdx = sourceStackInfo.stackIndex;
-    if (sourceStackIdx === -1) {
-      console.warn('Unable to move card. Source stack is invalid');
-      return;
-    }
-    const targetStackIdx = targetStackInfo.stackIndex;
-    if (targetStackIdx === -1) {
-      console.warn('Unable to move card. Target stack is invalid');
-      return;
-    }
+  //   // Note: We need to perform a deep replication of the data for downstream components to detect the exact change
+  //   //       It would be better to use an immutable data library here
+  //   const cardStacksCopy = [...this.cardStacks];
 
-    // Note: We need to perform a deep replication of the data for downstream components to detect the exact change
-    //       It would be better to use an immutable data library here
-    const cardStacksCopy = [...this.cardStacks];
+  //   switch (this.cardStacks[sourceStackInfo.stackIndex].behavior) {
+  //     case OPlayingCardStackMoveBehavior.MoveAllNextSiblings: {
+  //       // Remove card and next siblings below from source stack
+  //       const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] };
+  //       const sourceStackCardsCopy = sourceStackCopy.cards.slice(0, sourceStackInfo.cardIndex);
+  //       const cardsToMove = sourceStackCopy.cards.slice(sourceStackInfo.cardIndex);
+  //       if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
+  //         console.warn('Something went wrong with card removal');
+  //       }
+  //       sourceStackCopy.cards = sourceStackCardsCopy;
+  //       cardStacksCopy[sourceStackIdx] = sourceStackCopy;
 
-    switch (this.cardStacks[sourceStackInfo.stackIndex].behavior) {
-      case OPlayingCardStackBehavior.MoveAllNextSiblings: {
-        // Remove card and next siblings below from source stack
-        const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] };
-        const sourceStackCardsCopy = sourceStackCopy.cards.slice(0, sourceStackInfo.cardIndex);
-        const cardsToMove = sourceStackCopy.cards.slice(sourceStackInfo.cardIndex);
-        if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
-          console.warn('Something went wrong with card removal');
-        }
-        sourceStackCopy.cards = sourceStackCardsCopy;
-        cardStacksCopy[sourceStackIdx] = sourceStackCopy;
+  //       // Add card and next siblings to target stack
+  //       const targetStackCopy = { ...this.cardStacks[targetStackIdx] };
+  //       const targetStackCardsCopy = [...targetStackCopy.cards];
+  //       targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove);
+  //       targetStackCopy.cards = targetStackCardsCopy;
+  //       cardStacksCopy[targetStackIdx] = targetStackCopy;
 
-        // Add card and next siblings to target stack
-        const targetStackCopy = { ...this.cardStacks[targetStackIdx] };
-        const targetStackCardsCopy = [...targetStackCopy.cards];
-        targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove);
-        targetStackCopy.cards = targetStackCardsCopy;
-        cardStacksCopy[targetStackIdx] = targetStackCopy;
+  //       break;
+  //     }
+  //     case OPlayingCardStackMoveBehavior.MoveIndividually: {
+  //       // Remove only the one card from source stack
+  //       const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] };
+  //       const sourceStackCardsCopy = [...sourceStackCopy.cards];
+  //       const cardsToMove = sourceStackCardsCopy.splice(sourceStackInfo.cardIndex, 1);
+  //       if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
+  //         console.warn('Something went wrong with card removal');
+  //       }
+  //       sourceStackCopy.cards = sourceStackCardsCopy;
+  //       cardStacksCopy[sourceStackIdx] = sourceStackCopy;
 
-        break;
-      }
-      case OPlayingCardStackBehavior.MoveIndividually: {
-        // Remove only the one card from source stack
-        const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] };
-        const sourceStackCardsCopy = [...sourceStackCopy.cards];
-        const cardsToMove = sourceStackCardsCopy.splice(sourceStackInfo.cardIndex, 1);
-        if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
-          console.warn('Something went wrong with card removal');
-        }
-        sourceStackCopy.cards = sourceStackCardsCopy;
-        cardStacksCopy[sourceStackIdx] = sourceStackCopy;
+  //       // Add the one card to the target stack
+  //       const targetStackCopy = { ...this.cardStacks[targetStackIdx] };
+  //       const targetStackCardsCopy = [...targetStackCopy.cards];
+  //       targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove);
+  //       targetStackCopy.cards = targetStackCardsCopy;
+  //       cardStacksCopy[targetStackIdx] = targetStackCopy;
 
-        // Add the one card to the target stack
-        const targetStackCopy = { ...this.cardStacks[targetStackIdx] };
-        const targetStackCardsCopy = [...targetStackCopy.cards];
-        targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove);
-        targetStackCopy.cards = targetStackCardsCopy;
-        cardStacksCopy[targetStackIdx] = targetStackCopy;
+  //       break;
+  //     }
+  //   }
 
-        break;
-      }
-    }
-
-    this.cardStacks = cardStacksCopy;
-  }
+  //   this.cardStacks = cardStacksCopy;
+  // }
 }
 
-export const createNewPlayingCardsContextValue = (cardStacks: PlayingCardStackData[]) => new PlayingCardsContextData(cardStacks);
-export const PlayingCardsContext = createContext<InstanceType<typeof PlayingCardsContextData> | null>(null);
-export type PlayingCardsContextType = typeof PlayingCardsContextData;
-
-function useModel() {
-  const playingCardsContext = useContext(PlayingCardsContext);
-  if (!playingCardsContext) {
-    throw new Error('useModel must be used within a PlayingCardsContext');
-  }
-  const [cardStacks, setCardStacks] = useState(playingCardsContext.getCardStacks());
-
-  const handleContextChange = useCallback(
-    (modelChanged: boolean) => {
-      if (modelChanged) {
-        setCardStacks(playingCardsContext.getCardStacks());
-      } else {
-        // We are here because of an aborted drop. Reset the state to cause a re-render
-        setCardStacks([...playingCardsContext.getCardStacks()]);
-      }
-    },
-    [playingCardsContext],
-  );
-
-  useEffect(() => {
-    playingCardsContext.addChangeListener(handleContextChange);
-    return () => playingCardsContext.removeChangeListener(handleContextChange);
-  }, [playingCardsContext]);
-
-  return {
-    cardStacks,
-  };
-}
+export const createNewPlayingCardsContextValue = () => new PlayingCardsCanvasContextData();
+export const PlayingCardsCanvasContext = createContext<InstanceType<typeof PlayingCardsCanvasContextData> | null>(null);
 
 function useDragManager() {
-  const playingCardsContext = useContext(PlayingCardsContext);
+  const playingCardsContext = useContext(PlayingCardsCanvasContext);
   if (!playingCardsContext) {
     throw new Error('useDragManager must be used within a PlayingCardsContext');
   }
@@ -231,7 +193,7 @@ function useDropTarget(stackInfo: Immutable<PlayingCardStackInfo>) {
   const [isDragOver, setIsDragOver] = useState(false);
 
   const isActivated = useMemo(() => {
-    return activeDragInfo && activeDragInfo.stackIndex !== stackInfo.stackIndex;
+    return activeDragInfo && activeDragInfo.stackId !== stackInfo.stackId;
   }, [activeDragInfo, stackInfo]);
 
   const handleDropTargetEnter = useCallback(() => {
@@ -330,7 +292,7 @@ function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: Play
 }
 
 function useCanvas() {
-  const playingCardsContext = useContext(PlayingCardsContext);
+  const playingCardsContext = useContext(PlayingCardsCanvasContext);
   if (!playingCardsContext) {
     throw new Error('useCanvas must be used within a PlayingCardsContext');
   }
@@ -341,6 +303,7 @@ function useCanvas() {
       return;
     }
     playingCardsContext.setCanvasElement(node);
+    console.log('registered canvas');
     setIsCanvasAvailable(node !== null);
   }, []);
 
@@ -351,7 +314,6 @@ function useCanvas() {
 }
 
 export const PlayingCardsHooks = {
-  useModel,
   useDropTarget,
   useDraggable,
   useCanvas,

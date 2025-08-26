@@ -1,8 +1,8 @@
 import { LAYOUT_CONSTANTS } from '@/data/constants';
-import { OPlayingCardStackBehavior, type PlayingCanvasPosition, type PlayingCardStackData } from '@/data/types';
+import { type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackView } from '@/data/types';
 import type { Immutable } from '@/lib';
 import { SolitaireContextHooks } from '@/utils/solitaire-context';
-import { useEffect, useState, type ComponentProps } from 'react';
+import { useEffect, useMemo, useState, type ComponentProps } from 'react';
 import { StackablePlayingCardsStack } from './stackable-playing-card';
 
 export type DiscardPilePileProps = Immutable<{
@@ -11,15 +11,19 @@ export type DiscardPilePileProps = Immutable<{
   ComponentProps<'div'>;
 
 export function DiscardPile({ position, ...props }: DiscardPilePileProps) {
-  const { topCard, nextCard } = SolitaireContextHooks.useDiscardPile();
-  const [cardStack, setCardStack] = useState<PlayingCardStackData>({
+  const { talonMeta, topCard, nextCard } = SolitaireContextHooks.useTalon();
+  const [viewData, setViewData] = useState<PlayingCardStackData>({
+    meta: talonMeta,
     cards: [],
-    position,
-    hasDropTarget: false,
-    behavior: OPlayingCardStackBehavior.MoveOnlyTop,
-    stackedCardOffsetX: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_XOFFSET,
-    stackedCardOffsetY: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_YOFFSET,
   });
+  const view = useMemo<PlayingCardStackView>(
+    () => ({
+      position,
+      stackedCardOffsetX: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_XOFFSET,
+      stackedCardOffsetY: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_YOFFSET,
+    }),
+    [position],
+  );
 
   useEffect(() => {
     let cards = [];
@@ -29,15 +33,11 @@ export function DiscardPile({ position, ...props }: DiscardPilePileProps) {
     if (topCard) {
       cards.push(topCard);
     }
-    setCardStack({
+    setViewData({
+      meta: talonMeta,
       cards,
-      position,
-      hasDropTarget: false,
-      behavior: OPlayingCardStackBehavior.MoveOnlyTop,
-      stackedCardOffsetX: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_XOFFSET,
-      stackedCardOffsetY: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_YOFFSET,
     });
   }, [topCard, nextCard]);
 
-  return <StackablePlayingCardsStack {...props} cardStack={cardStack} stackIndex={100} />;
+  return <StackablePlayingCardsStack {...props} data={viewData} view={view} />;
 }

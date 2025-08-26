@@ -4,21 +4,21 @@ import { cn } from '@/lib/utils';
 import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
 import type { PlayingCardsStackProps } from './types';
 
-export function StackablePlayingCardsStack({ cardStack, stackIndex, ...props }: PlayingCardsStackProps) {
+export function StackablePlayingCardsStack({ data, view, ...props }: PlayingCardsStackProps) {
   return (
     <>
       <div
         {...props}
         className={`absolute size-fit`}
         style={{
-          left: `${cardStack.position.x}px`,
-          top: `${cardStack.position.y}px`,
+          left: `${view.position.x}px`,
+          top: `${view.position.y}px`,
           pointerEvents: 'none',
         }}
       >
         <CardOutline className={cn('stroke-gray-700 dark:stroke-gray-300', CARD_DIMS_CLASS)} />
       </div>
-      <StackablePlayingCardHolder cardStack={cardStack} stackInfo={{ stackIndex, cardIndex: 0 }} position={cardStack.position} />
+      <StackablePlayingCardHolder data={data} view={view} index={0} />
     </>
   );
 }

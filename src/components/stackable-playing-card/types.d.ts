@@ -1,13 +1,14 @@
-export type PlayingCardProps = Immutable<{
-  cardStack: PlayingCardStackData;
-  stackInfo: PlayingCardStackInfo;
-  position: PlayingCanvasPosition;
-  isPreviousSiblingBeingDragged?: boolean;
-}> &
-  ComponentProps<'div'>;
+import type { PlayingCardStackData, PlayingCardStackView } from '@/data/types';
+import type { ComponentProps } from 'react';
 
-export type PlayingCardsStackProps = Immutable<{
-  cardStack: PlayingCardStackData;
-  stackIndex: number;
-}> &
-  ComponentProps<'div'>;
+export type PlayingCardProps = {
+  data: PlayingCardStackData;
+  view: PlayingCardStackView;
+  index: number;
+  isPreviousSiblingBeingDragged?: boolean;
+} & ComponentProps<'div'>;
+
+export type PlayingCardsStackProps = {
+  data: PlayingCardStackData;
+  view: PlayingCardStackView;
+} & ComponentProps<'div'>;

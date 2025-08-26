@@ -17,7 +17,7 @@ export type DrawPileCardProps = Immutable<{
   ComponentProps<'div'>;
 
 export function DrawPileCard({ index }: DrawPileCardProps) {
-  const { doDrawCards } = SolitaireContextHooks.useDrawPile();
+  const { doDrawCards } = SolitaireContextHooks.useStock();
 
   const handleCardClick = useCallback(
     (e: React.MouseEvent) => {
@@ -54,7 +54,7 @@ export type DrawPilePileProps = Immutable<{
   ComponentProps<'div'>;
 
 export function DrawPile({ position, ...props }: DrawPilePileProps) {
-  const { drawPileCount, doResetDrawPile } = SolitaireContextHooks.useDrawPile();
+  const { drawPileCount, doResetDrawPile } = SolitaireContextHooks.useStock();
 
   return (
     <div

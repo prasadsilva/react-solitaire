@@ -1,35 +1,122 @@
-import type { PlayingCardDescriptor } from '@/data/types';
+import {
+  OPlayingCardStackDropBehavior,
+  OPlayingCardStackMoveBehavior,
+  OSolitaireCardStack,
+  type PlayingCardDescriptor,
+  type PlayingCardStackBehavior,
+  type PlayingCardStackData,
+  type PlayingCardStackDropBehavior,
+  type SolitaireCardStack,
+} from '@/data/types';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { generateNewSolitaireDeck } from './deck-builder';
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
 
 class SolitaireData {
-  private drawPile: PlayingCardDescriptor[];
-  private discardPile: PlayingCardDescriptor[];
+  private cardStacks: { [key: string]: PlayingCardStackData } = {};
   private changeListeners: Set<SolitaireContextChangeListener>;
 
   public constructor() {
-    this.drawPile = generateNewSolitaireDeck();
-    this.discardPile = [];
     this.changeListeners = new Set();
+
+    this.registerStack(
+      OSolitaireCardStack.Stock,
+      OPlayingCardStackMoveBehavior.Immovable,
+      OPlayingCardStackDropBehavior.NotAccepting,
+      generateNewSolitaireDeck(),
+    );
+    this.registerStack(OSolitaireCardStack.Talon, OPlayingCardStackMoveBehavior.MoveOnlyTop, OPlayingCardStackDropBehavior.NotAccepting);
+    this.registerStack(
+      OSolitaireCardStack.Foundation1,
+      OPlayingCardStackMoveBehavior.Immovable,
+      OPlayingCardStackDropBehavior.NotAccepting,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Foundation2,
+      OPlayingCardStackMoveBehavior.Immovable,
+      OPlayingCardStackDropBehavior.NotAccepting,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Foundation3,
+      OPlayingCardStackMoveBehavior.Immovable,
+      OPlayingCardStackDropBehavior.NotAccepting,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Foundation4,
+      OPlayingCardStackMoveBehavior.Immovable,
+      OPlayingCardStackDropBehavior.NotAccepting,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Tableau1,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Tableau2,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Tableau3,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Tableau4,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Tableau5,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Tableau6,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Tableau7,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
   }
 
-  public getDrawPile() {
-    return this.drawPile;
+  private registerStack(
+    id: SolitaireCardStack,
+    moveBehavior: PlayingCardStackBehavior,
+    dropBehavior: PlayingCardStackDropBehavior,
+    cards: PlayingCardDescriptor[] = [],
+  ) {
+    this.cardStacks[id] = {
+      meta: {
+        id,
+        moveBehavior,
+        dropBehavior,
+      },
+      cards,
+    };
   }
 
-  public getDiscardPile() {
-    return this.discardPile;
+  public getStock() {
+    return this.cardStacks[OSolitaireCardStack.Stock];
+  }
+
+  public getTalon() {
+    return this.cardStacks[OSolitaireCardStack.Talon];
   }
 
   drawCards() {
-    if (this.drawPile.length > 0) {
-      const drawnCards = this.drawPile.slice(0, 3);
-      this.drawPile = this.drawPile.slice(3);
-      this.discardPile = [...this.discardPile, ...drawnCards];
-      console.log(`draw pile count: ${this.drawPile.length}`);
-      console.log(`discard pile count: ${this.discardPile.length}`);
+    const stock = this.getStock();
+    const talon = this.getTalon();
+    if (stock.cards.length > 0) {
+      const drawnCards = stock.cards.slice(0, 3);
+      stock.cards = stock.cards.slice(3);
+      talon.cards = [...talon.cards, ...drawnCards];
+      console.log(`stock count: ${stock.cards.length}`);
+      console.log(`talon count: ${talon.cards.length}`);
       this.notifyContextStateChange(true);
     } else {
       this.notifyContextStateChange(false);
@@ -37,9 +124,11 @@ class SolitaireData {
   }
 
   resetDrawPile() {
-    if (this.drawPile.length === 0 && this.discardPile.length > 0) {
-      this.drawPile = this.discardPile;
-      this.discardPile = [];
+    const stock = this.getStock();
+    const talon = this.getTalon();
+    if (stock.cards.length === 0 && talon.cards.length > 0) {
+      stock.cards = talon.cards;
+      talon.cards = [];
       this.notifyContextStateChange(true);
     } else {
       this.notifyContextStateChange(false);
@@ -60,21 +149,22 @@ class SolitaireData {
 export const createNewSolitaireContextValue = () => new SolitaireData();
 export const SolitaireContext = createContext<InstanceType<typeof SolitaireData> | null>(null);
 
-function useDrawPile() {
+function useStock() {
   const context = useContext(SolitaireContext);
   if (!context) {
     throw new Error('useDrawPile must be used within a SolitaireContext');
   }
-  const [drawPile, setDrawPile] = useState(context.getDrawPile());
-  const drawPileCount = useMemo(() => drawPile.length, [drawPile]);
+  const [stock, setStock] = useState(context.getStock().cards);
+  const drawPileCount = useMemo(() => stock.length, [stock]);
 
   const handleContextChange = useCallback(
     (modelChanged: boolean) => {
+      // TODO: It would be better to know if only the data we cared about changed
       if (modelChanged) {
-        setDrawPile(context.getDrawPile());
+        setStock(context.getStock().cards);
       } else {
         // We are here because of an aborted action. Reset the state to cause a re-render
-        setDrawPile([...context.getDrawPile()]);
+        setStock([...context.getStock().cards]);
       }
     },
     [context],
@@ -100,23 +190,24 @@ function useDrawPile() {
   };
 }
 
-function useDiscardPile() {
+function useTalon() {
   const context = useContext(SolitaireContext);
   if (!context) {
     throw new Error('useDiscardPile must be used within a SolitaireContext');
   }
-  const [discardPile, setDiscardPile] = useState(context.getDiscardPile());
-  const discardPileCount = useMemo(() => discardPile.length, [discardPile]);
-  const topCard = useMemo(() => (discardPile.length > 0 ? discardPile[discardPile.length - 1] : null), [discardPile]);
-  const nextCard = useMemo(() => (discardPile.length > 1 ? discardPile[discardPile.length - 2] : null), [discardPile]);
+  const talonMeta = useMemo(() => context.getTalon().meta, [context]);
+  const [talonCards, setTalonCards] = useState(context.getTalon().cards);
+  const talonCount = useMemo(() => talonCards.length, [talonCards]);
+  const topCard = useMemo(() => (talonCards.length > 0 ? talonCards[talonCards.length - 1] : null), [talonCards]);
+  const nextCard = useMemo(() => (talonCards.length > 1 ? talonCards[talonCards.length - 2] : null), [talonCards]);
 
   const handleContextChange = useCallback(
     (modelChanged: boolean) => {
       if (modelChanged) {
-        setDiscardPile(context.getDiscardPile());
+        setTalonCards(context.getTalon().cards);
       } else {
         // We are here because of an aborted action. Reset the state to cause a re-render
-        setDiscardPile([...context.getDiscardPile()]);
+        setTalonCards([...context.getTalon().cards]);
       }
     },
     [context],
@@ -128,13 +219,14 @@ function useDiscardPile() {
   }, [context]);
 
   return {
-    discardPileCount,
+    talonMeta,
+    talonCount,
     topCard,
     nextCard,
   };
 }
 
 export const SolitaireContextHooks = {
-  useDrawPile,
-  useDiscardPile,
+  useStock,
+  useTalon,
 };
