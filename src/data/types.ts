@@ -19,6 +19,8 @@ export interface PlayingCardDescriptor {
   cardImg: string;
 }
 
+export type PlayingCardDescriptorList = PlayingCardDescriptor[];
+
 export interface PlayingCanvasPosition {
   x: number;
   y: number;
@@ -96,7 +98,7 @@ export interface PlayingCardStackMeta {
 
 export interface PlayingCardStackData {
   meta: PlayingCardStackMeta;
-  cards: PlayingCardDescriptor[];
+  cards: PlayingCardDescriptorList;
 }
 
 export interface PlayingCardStackView {

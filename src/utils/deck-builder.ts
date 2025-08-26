@@ -1,6 +1,17 @@
 import { AllCardsC, AllCardsD, AllCardsH, AllCardsS } from '@/data/cards';
+import {
+  OSolitaireTableauStack,
+  type PlayingCardDescriptor,
+  type PlayingCardDescriptorList,
+  type SolitaireTableauStack,
+} from '@/data/types';
 
-export function generateNewSolitaireDeck() {
+interface NewSolitaireGameData {
+  drawCards: PlayingCardDescriptor[];
+  tableauCards: { [key: SolitaireTableauStack]: PlayingCardDescriptorList };
+}
+
+export function generateNewSolitaireGameData(): NewSolitaireGameData {
   const allCards = [...AllCardsC, ...AllCardsD, ...AllCardsH, ...AllCardsS];
 
   // Durstenfeld shuffle - https://en.wikipedia.org/wiki/Fisher–Yates_shuffle#The_modern_algorithm
@@ -10,5 +21,37 @@ export function generateNewSolitaireDeck() {
     [allCards[i], allCards[j]] = [allCards[j], allCards[i]];
   }
 
-  return allCards;
+  // Deal the tableau cards
+  const tableauTracker = [
+    OSolitaireTableauStack.Tableau1,
+    OSolitaireTableauStack.Tableau2,
+    OSolitaireTableauStack.Tableau3,
+    OSolitaireTableauStack.Tableau4,
+    OSolitaireTableauStack.Tableau5,
+    OSolitaireTableauStack.Tableau6,
+    OSolitaireTableauStack.Tableau7,
+  ];
+  const tableauCards: { [key: SolitaireTableauStack]: PlayingCardDescriptorList } = {
+    [OSolitaireTableauStack.Tableau1]: [],
+    [OSolitaireTableauStack.Tableau2]: [],
+    [OSolitaireTableauStack.Tableau3]: [],
+    [OSolitaireTableauStack.Tableau4]: [],
+    [OSolitaireTableauStack.Tableau5]: [],
+    [OSolitaireTableauStack.Tableau6]: [],
+    [OSolitaireTableauStack.Tableau7]: [],
+  };
+  while (tableauTracker.length > 0) {
+    tableauTracker.forEach((tableauKey) => {
+      const card = allCards.pop();
+      if (card) {
+        tableauCards[tableauKey].push(card);
+      }
+    });
+    tableauTracker.splice(0, 1);
+  }
+
+  return {
+    drawCards: allCards,
+    tableauCards,
+  };
 }

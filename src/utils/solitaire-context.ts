@@ -10,7 +10,7 @@ import {
   type SolitaireTableauStack,
 } from '@/data/types';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { generateNewSolitaireDeck } from './deck-builder';
+import { generateNewSolitaireGameData } from './deck-builder';
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
 
@@ -21,11 +21,12 @@ class SolitaireData {
   public constructor() {
     this.changeListeners = new Set();
 
+    const newSolitaireGameData = generateNewSolitaireGameData();
     this.registerStack(
       OSolitaireCardStack.Stock,
       OPlayingCardStackMoveBehavior.Immovable,
       OPlayingCardStackDropBehavior.NotAccepting,
-      generateNewSolitaireDeck(),
+      newSolitaireGameData.drawCards,
     );
     this.registerStack(OSolitaireCardStack.Talon, OPlayingCardStackMoveBehavior.MoveOnlyTop, OPlayingCardStackDropBehavior.NotAccepting);
     this.registerStack(
@@ -52,36 +53,43 @@ class SolitaireData {
       OSolitaireCardStack.Tableau1,
       OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
       OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau1],
     );
     this.registerStack(
       OSolitaireCardStack.Tableau2,
       OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
       OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau2],
     );
     this.registerStack(
       OSolitaireCardStack.Tableau3,
       OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
       OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau3],
     );
     this.registerStack(
       OSolitaireCardStack.Tableau4,
       OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
       OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau4],
     );
     this.registerStack(
       OSolitaireCardStack.Tableau5,
       OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
       OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau5],
     );
     this.registerStack(
       OSolitaireCardStack.Tableau6,
       OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
       OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau6],
     );
     this.registerStack(
       OSolitaireCardStack.Tableau7,
       OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
       OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau7],
     );
   }
 
