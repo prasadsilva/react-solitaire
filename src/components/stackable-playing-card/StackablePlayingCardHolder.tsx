@@ -1,24 +1,20 @@
 import { StackablePlayingCardDropTarget } from '@/components/stackable-playing-card/StackablePlayingCardDropTarget';
-import { OPlayingCardStackDropBehavior, type PlayingCanvasPosition, type PlayingCardStackInfo } from '@/data/types';
-import { useMemo } from 'react';
+import { OPlayingCardStackDropBehavior } from '@/data/types';
 import { StackablePlayingCard } from './StackablePlayingCard';
 import type { PlayingCardProps } from './types';
 
-export function StackablePlayingCardHolder({ data, view, index, isPreviousSiblingBeingDragged, ...props }: PlayingCardProps) {
-  const droptargetStackInfo = useMemo<PlayingCardStackInfo>(() => ({ stackId: data.meta.id, cardIndex: data.cards.length }), [data.cards]);
-  const droptargetPosition = useMemo<PlayingCanvasPosition>(
-    () => ({
+export function StackablePlayingCardHolder({ data, view, index, isPreviousSiblingBeingDragged }: PlayingCardProps) {
+  const hasValidCard = index < data.cards.length;
+  if (hasValidCard) {
+    return <StackablePlayingCard data={data} view={view} index={index} isPreviousSiblingBeingDragged={isPreviousSiblingBeingDragged} />;
+  }
+
+  if (!isPreviousSiblingBeingDragged && data.meta.dropBehavior === OPlayingCardStackDropBehavior.AcceptsAny) {
+    const droptargetStackInfo = { stackId: data.meta.id, cardIndex: data.cards.length };
+    const droptargetPosition = {
       x: view.position.x + data.cards.length * view.stackedCardOffsetX,
       y: view.position.y + data.cards.length * view.stackedCardOffsetY,
-    }),
-    [view.position, data.cards],
-  );
-
-  return index < data.cards.length ? (
-    <StackablePlayingCard {...props} data={data} view={view} index={index} isPreviousSiblingBeingDragged={isPreviousSiblingBeingDragged} />
-  ) : (
-    data.meta.dropBehavior === OPlayingCardStackDropBehavior.AcceptsAny && (
-      <StackablePlayingCardDropTarget stackInfo={droptargetStackInfo} position={droptargetPosition} />
-    )
-  );
+    };
+    return <StackablePlayingCardDropTarget stackInfo={droptargetStackInfo} position={droptargetPosition} />;
+  }
 }
