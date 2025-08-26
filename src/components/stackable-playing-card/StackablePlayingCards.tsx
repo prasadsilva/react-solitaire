@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
 import type { PlayingCardsStackProps } from './types';
 
-export function StackablePlayingCardsStack({ data, view, ...props }: PlayingCardsStackProps) {
+export function StackablePlayingCards({ data, view, ...props }: PlayingCardsStackProps) {
   return (
     <>
       <div

@@ -4,7 +4,7 @@ export type PlayingCardProps = {
   data: PlayingCardStackData;
   view: PlayingCardStackView;
   index: number;
-  isPreviousSiblingBeingDragged?: boolean;
+  hidden?: boolean;
 };
 
 export type PlayingCardsStackProps = {

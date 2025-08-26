@@ -3,13 +3,13 @@ import { OPlayingCardStackDropBehavior } from '@/data/types';
 import { StackablePlayingCard } from './StackablePlayingCard';
 import type { PlayingCardProps } from './types';
 
-export function StackablePlayingCardHolder({ data, view, index, isPreviousSiblingBeingDragged }: PlayingCardProps) {
+export function StackablePlayingCardHolder({ data, view, index, hidden }: PlayingCardProps) {
   const hasValidCard = index < data.cards.length;
   if (hasValidCard) {
-    return <StackablePlayingCard data={data} view={view} index={index} isPreviousSiblingBeingDragged={isPreviousSiblingBeingDragged} />;
+    return <StackablePlayingCard data={data} view={view} index={index} hidden={hidden} />;
   }
 
-  if (!isPreviousSiblingBeingDragged && data.meta.dropBehavior === OPlayingCardStackDropBehavior.AcceptsAny) {
+  if (data.meta.dropBehavior === OPlayingCardStackDropBehavior.AcceptsAny) {
     const droptargetStackInfo = { stackId: data.meta.id, cardIndex: data.cards.length };
     return <StackablePlayingCardDropTarget stackInfo={droptargetStackInfo} position={view.position} />;
   }

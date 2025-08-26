@@ -3,7 +3,7 @@ import { type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCard
 import type { Immutable } from '@/lib';
 import { SolitaireContextHooks } from '@/utils/solitaire-context';
 import { useEffect, useMemo, useState, type ComponentProps } from 'react';
-import { StackablePlayingCardsStack } from './stackable-playing-card';
+import { StackablePlayingCards } from './stackable-playing-card';
 
 export type DiscardPilePileProps = Immutable<{
   position: PlayingCanvasPosition;
@@ -39,5 +39,5 @@ export function DiscardPile({ position, ...props }: DiscardPilePileProps) {
     });
   }, [topCard, nextCard]);
 
-  return <StackablePlayingCardsStack {...props} data={viewData} view={view} />;
+  return <StackablePlayingCards {...props} data={viewData} view={view} />;
 }
