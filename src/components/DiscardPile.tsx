@@ -11,7 +11,8 @@ export type DiscardPilePileProps = Immutable<{
   ComponentProps<'div'>;
 
 export function DiscardPile({ position, ...props }: DiscardPilePileProps) {
-  const { talonMeta, topCard, nextCard } = SolitaireContextHooks.useTalon();
+  const { talonMeta, topCard, nextCard, talonCount } = SolitaireContextHooks.useTalon();
+  const firstShowDataIndex = useMemo(() => Math.max(talonCount - 2, 0), [talonCount]);
   const [viewData, setViewData] = useState<PlayingCardStackData>({
     meta: talonMeta,
     cards: [],
@@ -22,7 +23,7 @@ export function DiscardPile({ position, ...props }: DiscardPilePileProps) {
       stackedCardOffsetX: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_XOFFSET,
       stackedCardOffsetY: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_YOFFSET,
     }),
-    [position],
+    [position, talonCount],
   );
 
   useEffect(() => {
@@ -39,5 +40,5 @@ export function DiscardPile({ position, ...props }: DiscardPilePileProps) {
     });
   }, [topCard, nextCard]);
 
-  return <StackablePlayingCards {...props} data={viewData} view={view} />;
+  return <StackablePlayingCards {...props} data={viewData} view={view} firstCardDataIndex={firstShowDataIndex} />;
 }

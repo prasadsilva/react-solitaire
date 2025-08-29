@@ -13,7 +13,7 @@ export class DragManager<T> {
   private usageCount: number;
   private currentDragData: T | null;
   private dragStateChangeListeners: Set<(dragCard: T | null) => void>;
-  private dropCallback: (dragData: T) => void | null;
+  private dropCallback: (dragData: T, dropTargetData: T | null) => void | null;
   private canvasElement: HTMLElement | null;
   private dropTargetRegistry: Map<HTMLElement, DropTargetData<T>>;
   private currentDropTarget: DropTargetData<T> | null;
@@ -157,7 +157,7 @@ export class DragManager<T> {
 
   private handlePointerReleaseNative = () => {
     if (this.currentDragData) {
-      this.dropCallback(this.currentDragData);
+      this.dropCallback(this.currentDragData, this.currentDropTarget && this.currentDropTarget.data);
     }
     this.clearActiveDragHandler();
   };

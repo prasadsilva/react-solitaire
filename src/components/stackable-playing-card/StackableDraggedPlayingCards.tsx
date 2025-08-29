@@ -2,7 +2,7 @@ import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/data/constants';
 import { cn } from '@/lib/utils';
 import type { PlayingCardProps } from './types';
 
-export function StackableDraggedPlayingCards({ data, view, index }: PlayingCardProps) {
+export function StackableDraggedPlayingCards({ data, view, index }: Omit<PlayingCardProps, 'dataIndex'>) {
   const cardPositions = [view.position];
   let startPositionX = view.position.x;
   let startPositionY = view.position.y;

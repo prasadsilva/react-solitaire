@@ -11,7 +11,7 @@ class PlayingCardsCanvasContextData {
 
   public constructor() {
     this.changeListeners = new Set();
-    this.dragManager = new DragManager((card) => this.tryHandleDrop(card));
+    this.dragManager = new DragManager((card, slot) => this.tryHandleDrop(card, slot));
   }
 
   public cleanup() {
@@ -51,7 +51,10 @@ class PlayingCardsCanvasContextData {
     this.dragManager.unregisterDropTarget(element);
   }
 
-  private tryHandleDrop(stackInfo: PlayingCardStackInfo) {
+  private tryHandleDrop(cardStackInfo: PlayingCardStackInfo, slotStackInfo: PlayingCardStackInfo | null) {
+    console.log(
+      `tryHandleDrop: ${cardStackInfo.stackId}:${cardStackInfo.cardIndex} -> ${slotStackInfo && slotStackInfo.stackId}:${slotStackInfo && slotStackInfo.cardIndex}`,
+    );
     const currentDropTarget = this.dragManager.getCurrentDropTarget();
     if (currentDropTarget) {
       // TODO:
@@ -259,25 +262,29 @@ function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: Play
 
   const [isBeingDragged, setIsBeingDragged] = useState(false);
 
-  const draggableRef = useCallback((node: HTMLDivElement | null) => {
-    if (node) {
-      const handlePointerDown = (e: PointerEvent) => {
-        // https://stackoverflow.com/a/70737325/2847817
-        if (node.hasPointerCapture(e.pointerId)) {
-          node.releasePointerCapture(e.pointerId);
-        }
-        setIsBeingDragged(true);
-        setActiveDrag(stackInfo, e.clientX, e.clientY, handleDrag, handleEndDrag);
-        e.preventDefault();
-        e.stopPropagation();
-      };
+  const draggableRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (node) {
+        const handlePointerDown = (e: PointerEvent) => {
+          // https://stackoverflow.com/a/70737325/2847817
+          if (node.hasPointerCapture(e.pointerId)) {
+            node.releasePointerCapture(e.pointerId);
+          }
+          setIsBeingDragged(true);
+          console.log(`active drag: ${stackInfo.stackId}:${stackInfo.cardIndex}`);
+          setActiveDrag(stackInfo, e.clientX, e.clientY, handleDrag, handleEndDrag);
+          e.preventDefault();
+          e.stopPropagation();
+        };
 
-      node.addEventListener('pointerdown', handlePointerDown);
-      return () => {
-        node.removeEventListener('pointerdown', handlePointerDown);
-      };
-    }
-  }, []);
+        node.addEventListener('pointerdown', handlePointerDown);
+        return () => {
+          node.removeEventListener('pointerdown', handlePointerDown);
+        };
+      }
+    },
+    [stackInfo],
+  );
 
   // Reset the internal position if param changes
   useEffect(() => {

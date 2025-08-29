@@ -29,5 +29,5 @@ export function TableauPile({ tableauId, position, ...props }: TableauPileProps)
     [position],
   );
 
-  return <StackablePlayingCards {...props} data={data} view={view} />;
+  return <StackablePlayingCards {...props} data={data} view={view} firstCardDataIndex={0} />;
 }

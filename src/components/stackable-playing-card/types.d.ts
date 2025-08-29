@@ -4,10 +4,12 @@ export type PlayingCardProps = {
   data: PlayingCardStackData;
   view: PlayingCardStackView;
   index: number;
+  dataIndex: number;
   hidden?: boolean;
 };
 
 export type PlayingCardsStackProps = {
   data: PlayingCardStackData;
   view: PlayingCardStackView;
+  firstCardDataIndex: number;
 };

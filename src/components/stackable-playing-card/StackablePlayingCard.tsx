@@ -7,11 +7,12 @@ import { StackableDraggedPlayingCards } from './StackableDraggedPlayingCards';
 import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
 import type { PlayingCardProps } from './types';
 
-export function StackablePlayingCard({ data, view, index, hidden }: PlayingCardProps) {
+export function StackablePlayingCard({ data, view, index, dataIndex, hidden }: PlayingCardProps) {
   const { draggableRef, isBeingDragged, currentPosition } = PlayingCardsHooks.useDraggable(
-    { stackId: data.meta.id, cardIndex: index },
+    { stackId: data.meta.id, cardIndex: dataIndex },
     view.position,
   );
+  // console.log(`card.dataIndex[${data.meta.id}]: ${dataIndex}`);
 
   // TODO: These could be moved into the hook?
   const isDraggable = data.meta.moveBehavior !== OPlayingCardStackMoveBehavior.MoveOnlyTop || index === data.cards.length - 1;
@@ -48,7 +49,13 @@ export function StackablePlayingCard({ data, view, index, hidden }: PlayingCardP
         <img src={data.cards[index].cardImg} className={cn('', CARD_DIMS_CLASS)} draggable={false} />
       </div>
       {/* Hide the in-place siblings when dragging and show a static stack instead for performance reasons */}
-      <StackablePlayingCardHolder data={data} view={nextSiblingStaticView} index={index + 1} hidden={hidden || isBeingDragged} />
+      <StackablePlayingCardHolder
+        data={data}
+        view={nextSiblingStaticView}
+        index={index + 1}
+        dataIndex={dataIndex + 1}
+        hidden={hidden || isBeingDragged}
+      />
       {isBeingDragged && index < data.cards.length - 1 && (
         <StackableDraggedPlayingCards data={data} view={nextSiblingDragView} index={index + 1} />
       )}

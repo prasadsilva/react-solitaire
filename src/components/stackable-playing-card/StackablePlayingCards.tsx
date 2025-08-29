@@ -4,11 +4,10 @@ import { cn } from '@/lib/utils';
 import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
 import type { PlayingCardsStackProps } from './types';
 
-export function StackablePlayingCards({ data, view, ...props }: PlayingCardsStackProps) {
+export function StackablePlayingCards({ data, view, firstCardDataIndex }: PlayingCardsStackProps) {
   return (
     <>
       <div
-        {...props}
         className={`absolute size-fit`}
         style={{
           left: `${view.position.x}px`,
@@ -18,7 +17,7 @@ export function StackablePlayingCards({ data, view, ...props }: PlayingCardsStac
       >
         <CardOutline className={cn('stroke-gray-700 dark:stroke-gray-300', CARD_DIMS_CLASS)} />
       </div>
-      <StackablePlayingCardHolder data={data} view={view} index={0} />
+      <StackablePlayingCardHolder data={data} view={view} index={0} dataIndex={firstCardDataIndex} />
     </>
   );
 }
