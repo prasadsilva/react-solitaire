@@ -3,7 +3,7 @@ import { CARD_DIMS_CLASS } from '@/data/constants';
 import type { PlayingCanvasPosition, PlayingCardStackInfo } from '@/data/types';
 import type { Immutable } from '@/lib';
 import { cn } from '@/lib/utils';
-import { PlayingCardsHooks } from '@/utils/game-context';
+import { PlayingCardsHooks } from '@/utils/playing-cards-context';
 import { type ComponentProps } from 'react';
 
 export type PlayingCardDropTargetProps = Immutable<{

@@ -4,7 +4,7 @@ import { CARD_DIMS_CLASS } from '@/data/constants';
 import type { PlayingCanvasPosition } from '@/data/types';
 import type { Immutable } from '@/lib';
 import { cn } from '@/lib/utils';
-import { SolitaireContextHooks } from '@/utils/solitaire-context';
+import { SolitaireHooks } from '@/utils/solitaire-context';
 import { useCallback, useMemo, type ComponentProps } from 'react';
 
 const MAX_VISIBLE_CARDS = 3;
@@ -17,7 +17,7 @@ export type DrawPileCardProps = Immutable<{
   ComponentProps<'div'>;
 
 export function DrawPileCard({ index }: DrawPileCardProps) {
-  const { doDrawCards } = SolitaireContextHooks.useStock();
+  const { doDrawCards } = SolitaireHooks.useStock();
 
   const handleCardClick = useCallback(
     (e: React.MouseEvent) => {
@@ -54,7 +54,7 @@ export type DrawPilePileProps = Immutable<{
   ComponentProps<'div'>;
 
 export function DrawPile({ position, ...props }: DrawPilePileProps) {
-  const { drawPileCount, doResetDrawPile } = SolitaireContextHooks.useStock();
+  const { drawPileCount, doResetDrawPile } = SolitaireHooks.useStock();
 
   return (
     <div

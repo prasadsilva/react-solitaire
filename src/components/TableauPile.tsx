@@ -1,7 +1,7 @@
 import { LAYOUT_CONSTANTS } from '@/data/constants';
 import type { PlayingCanvasPosition, PlayingCardStackData, PlayingCardStackView, SolitaireTableauStack } from '@/data/types';
 import type { Immutable } from '@/lib';
-import { SolitaireContextHooks } from '@/utils/solitaire-context';
+import { SolitaireHooks } from '@/utils/solitaire-context';
 import { useMemo, type ComponentProps } from 'react';
 import { StackablePlayingCards } from './stackable-playing-card';
 
@@ -12,7 +12,7 @@ export type TableauPileProps = Immutable<{
   ComponentProps<'div'>;
 
 export function TableauPile({ tableauId, position, ...props }: TableauPileProps) {
-  const { tableauMeta, tableauCards } = SolitaireContextHooks.useTableau(tableauId);
+  const { tableauMeta, tableauCards } = SolitaireHooks.useTableau(tableauId);
   const data = useMemo<PlayingCardStackData>(
     () => ({
       meta: tableauMeta,

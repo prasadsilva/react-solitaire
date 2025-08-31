@@ -1,7 +1,7 @@
 import { LAYOUT_CONSTANTS } from '@/data/constants';
 import { type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackView } from '@/data/types';
 import type { Immutable } from '@/lib';
-import { SolitaireContextHooks } from '@/utils/solitaire-context';
+import { SolitaireHooks } from '@/utils/solitaire-context';
 import { useEffect, useMemo, useState, type ComponentProps } from 'react';
 import { StackablePlayingCards } from './stackable-playing-card';
 
@@ -11,7 +11,7 @@ export type DiscardPilePileProps = Immutable<{
   ComponentProps<'div'>;
 
 export function DiscardPile({ position, ...props }: DiscardPilePileProps) {
-  const { talonMeta, topCard, nextCard, talonCount } = SolitaireContextHooks.useTalon();
+  const { talonMeta, topCard, nextCard, talonCount } = SolitaireHooks.useTalon();
   const firstShowDataIndex = useMemo(() => Math.max(talonCount - 2, 0), [talonCount]);
   const [viewData, setViewData] = useState<PlayingCardStackData>({
     meta: talonMeta,

@@ -6,15 +6,17 @@ import {
   type PlayingCardStackBehavior,
   type PlayingCardStackData,
   type PlayingCardStackDropBehavior,
+  type PlayingCardStackInfo,
   type SolitaireCardStack,
   type SolitaireTableauStack,
 } from '@/data/types';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { generateNewSolitaireGameData } from './deck-builder';
+import { PlayingCardsContext, type PlayingCardsContextListener } from './playing-cards-context';
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
 
-class SolitaireData {
+class SolitaireContextData implements PlayingCardsContextListener {
   private cardStacks: { [key: string]: PlayingCardStackData } = {};
   private changeListeners: Set<SolitaireContextChangeListener>;
 
@@ -93,6 +95,13 @@ class SolitaireData {
     );
   }
 
+  public onValidDrop(card: PlayingCardStackInfo, slot: PlayingCardStackInfo) {
+    console.log(`onValidDrop: ${card.stackId}:${card.cardIndex} -> ${slot && slot.stackId}:${slot && slot.cardIndex}`);
+  }
+  public onInvalidDrop(card: PlayingCardStackInfo) {
+    console.log(`onInvalidDrop: ${card.stackId}:${card.cardIndex}`);
+  }
+
   private registerStack(
     id: SolitaireCardStack,
     moveBehavior: PlayingCardStackBehavior,
@@ -159,11 +168,25 @@ class SolitaireData {
   }
 }
 
-export const createNewSolitaireContextValue = () => new SolitaireData();
-export const SolitaireContext = createContext<InstanceType<typeof SolitaireData> | null>(null);
+export const createNewSolitaireContextValue = () => new SolitaireContextData();
+const SolitaireContextImpl = createContext<InstanceType<typeof SolitaireContextData> | null>(null);
+
+export function SolitaireContext({ children, value }: React.ProviderProps<SolitaireContextData>) {
+  const playingCardsContext = useContext(PlayingCardsContext);
+  if (!playingCardsContext) {
+    throw new Error('SolitaireContext must be used within a PlayingCardsContext');
+  }
+
+  useEffect(() => {
+    playingCardsContext.addChangeListener(value);
+    return () => playingCardsContext.removeChangeListener(value);
+  }, [value]);
+
+  return <SolitaireContextImpl.Provider value={value}>{children}</SolitaireContextImpl.Provider>;
+}
 
 function useStock() {
-  const context = useContext(SolitaireContext);
+  const context = useContext(SolitaireContextImpl);
   if (!context) {
     throw new Error('useDrawPile must be used within a SolitaireContext');
   }
@@ -204,7 +227,7 @@ function useStock() {
 }
 
 function useTalon() {
-  const context = useContext(SolitaireContext);
+  const context = useContext(SolitaireContextImpl);
   if (!context) {
     throw new Error('useDiscardPile must be used within a SolitaireContext');
   }
@@ -240,7 +263,7 @@ function useTalon() {
 }
 
 function useTableau(id: SolitaireTableauStack) {
-  const context = useContext(SolitaireContext);
+  const context = useContext(SolitaireContextImpl);
   if (!context) {
     throw new Error('useDiscardPile must be used within a SolitaireContext');
   }
@@ -270,7 +293,7 @@ function useTableau(id: SolitaireTableauStack) {
   };
 }
 
-export const SolitaireContextHooks = {
+export const SolitaireHooks = {
   useStock,
   useTalon,
   useTableau,

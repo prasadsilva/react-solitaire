@@ -3,13 +3,13 @@ import type { Immutable } from '@/lib';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { DragManager } from './dragmanager';
 
-interface PlayingCardsCanvasContextListener {
+export interface PlayingCardsContextListener {
   onValidDrop: (card: PlayingCardStackInfo, slot: PlayingCardStackInfo) => void;
   onInvalidDrop: (card: PlayingCardStackInfo) => void;
 }
 
-class PlayingCardsCanvasContextData {
-  private contextListeners: Set<PlayingCardsCanvasContextListener>;
+class PlayingCardsContextData {
+  private contextListeners: Set<PlayingCardsContextListener>;
   private dragManager: DragManager<PlayingCardStackInfo>;
 
   public constructor() {
@@ -63,20 +63,16 @@ class PlayingCardsCanvasContextData {
   }
 
   private notifyValidDrop(cardStackInfo: PlayingCardStackInfo, slotStackInfo: PlayingCardStackInfo) {
-    console.log(
-      `notifyValidDrop: ${cardStackInfo.stackId}:${cardStackInfo.cardIndex} -> ${slotStackInfo && slotStackInfo.stackId}:${slotStackInfo && slotStackInfo.cardIndex}`,
-    );
     this.contextListeners.forEach((callback) => callback.onValidDrop(cardStackInfo, slotStackInfo));
   }
   private notifyInvalidDrop(cardStackInfo: PlayingCardStackInfo) {
-    console.log(`notifyInvalidDrop: ${cardStackInfo.stackId}:${cardStackInfo.cardIndex}`);
     this.contextListeners.forEach((callback) => callback.onInvalidDrop(cardStackInfo));
   }
 
-  public addChangeListener(callback: PlayingCardsCanvasContextListener) {
+  public addChangeListener(callback: PlayingCardsContextListener) {
     this.contextListeners.add(callback);
   }
-  public removeChangeListener(callback: PlayingCardsCanvasContextListener) {
+  public removeChangeListener(callback: PlayingCardsContextListener) {
     this.contextListeners.delete(callback);
   }
 
@@ -143,11 +139,11 @@ class PlayingCardsCanvasContextData {
   // }
 }
 
-export const createNewPlayingCardsContextValue = () => new PlayingCardsCanvasContextData();
-export const PlayingCardsCanvasContext = createContext<InstanceType<typeof PlayingCardsCanvasContextData> | null>(null);
+export const createNewPlayingCardsContextValue = () => new PlayingCardsContextData();
+export const PlayingCardsContext = createContext<InstanceType<typeof PlayingCardsContextData> | null>(null);
 
 function useDragManager() {
-  const playingCardsContext = useContext(PlayingCardsCanvasContext);
+  const playingCardsContext = useContext(PlayingCardsContext);
   if (!playingCardsContext) {
     throw new Error('useDragManager must be used within a PlayingCardsContext');
   }
@@ -305,7 +301,7 @@ function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: Play
 }
 
 function useCanvas() {
-  const playingCardsContext = useContext(PlayingCardsCanvasContext);
+  const playingCardsContext = useContext(PlayingCardsContext);
   if (!playingCardsContext) {
     throw new Error('useCanvas must be used within a PlayingCardsContext');
   }
