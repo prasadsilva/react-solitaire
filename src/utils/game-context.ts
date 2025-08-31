@@ -3,14 +3,17 @@ import type { Immutable } from '@/lib';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { DragManager } from './dragmanager';
 
-type PlayingCardsCanvasContextChangeListener = (modelChanged: boolean) => void;
+interface PlayingCardsCanvasContextListener {
+  onValidDrop: (card: PlayingCardStackInfo, slot: PlayingCardStackInfo) => void;
+  onInvalidDrop: (card: PlayingCardStackInfo) => void;
+}
 
 class PlayingCardsCanvasContextData {
-  private changeListeners: Set<PlayingCardsCanvasContextChangeListener>;
+  private contextListeners: Set<PlayingCardsCanvasContextListener>;
   private dragManager: DragManager<PlayingCardStackInfo>;
 
   public constructor() {
-    this.changeListeners = new Set();
+    this.contextListeners = new Set();
     this.dragManager = new DragManager((card, slot) => this.tryHandleDrop(card, slot));
   }
 
@@ -52,28 +55,31 @@ class PlayingCardsCanvasContextData {
   }
 
   private tryHandleDrop(cardStackInfo: PlayingCardStackInfo, slotStackInfo: PlayingCardStackInfo | null) {
-    console.log(
-      `tryHandleDrop: ${cardStackInfo.stackId}:${cardStackInfo.cardIndex} -> ${slotStackInfo && slotStackInfo.stackId}:${slotStackInfo && slotStackInfo.cardIndex}`,
-    );
-    const currentDropTarget = this.dragManager.getCurrentDropTarget();
-    if (currentDropTarget) {
-      // TODO:
-      // this.notifyValidDrop();
+    if (slotStackInfo) {
+      this.notifyValidDrop(cardStackInfo, slotStackInfo);
     } else {
-      // TODO:
-      // this.notifyInvalidDrop();
+      this.notifyInvalidDrop(cardStackInfo);
     }
   }
 
-  public addChangeListener(callback: PlayingCardsCanvasContextChangeListener) {
-    this.changeListeners.add(callback);
+  private notifyValidDrop(cardStackInfo: PlayingCardStackInfo, slotStackInfo: PlayingCardStackInfo) {
+    console.log(
+      `notifyValidDrop: ${cardStackInfo.stackId}:${cardStackInfo.cardIndex} -> ${slotStackInfo && slotStackInfo.stackId}:${slotStackInfo && slotStackInfo.cardIndex}`,
+    );
+    this.contextListeners.forEach((callback) => callback.onValidDrop(cardStackInfo, slotStackInfo));
   }
-  public removeChangeListener(callback: PlayingCardsCanvasContextChangeListener) {
-    this.changeListeners.delete(callback);
+  private notifyInvalidDrop(cardStackInfo: PlayingCardStackInfo) {
+    console.log(`notifyInvalidDrop: ${cardStackInfo.stackId}:${cardStackInfo.cardIndex}`);
+    this.contextListeners.forEach((callback) => callback.onInvalidDrop(cardStackInfo));
   }
-  private notifyContextStateChange(modelChanged: boolean) {
-    this.changeListeners.forEach((callback) => callback(modelChanged));
+
+  public addChangeListener(callback: PlayingCardsCanvasContextListener) {
+    this.contextListeners.add(callback);
   }
+  public removeChangeListener(callback: PlayingCardsCanvasContextListener) {
+    this.contextListeners.delete(callback);
+  }
+
   // private moveBetweenStacks(sourceStackInfo: PlayingCardStackInfo, targetStackInfo: PlayingCardStackInfo) {
   //   const sourceStackIdx = sourceStackInfo.stackIndex;
   //   if (sourceStackIdx === -1) {
