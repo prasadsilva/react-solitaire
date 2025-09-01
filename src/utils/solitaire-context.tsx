@@ -2,6 +2,8 @@ import {
   OPlayingCardStackDropBehavior,
   OPlayingCardStackMoveBehavior,
   OSolitaireCardStack,
+  OSolitaireFoundationStack,
+  OSolitaireTableauStack,
   type PlayingCardDescriptor,
   type PlayingCardStackBehavior,
   type PlayingCardStackData,
@@ -10,9 +12,20 @@ import {
   type SolitaireCardStack,
   type SolitaireTableauStack,
 } from '@/data/types';
+import { objectHasValue } from '@/lib/utils';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { generateNewSolitaireGameData } from './deck-builder';
 import { PlayingCardsContext, type PlayingCardsContextListener } from './playing-cards-context';
+
+function isTalonStack(value: string): boolean {
+  return value == OSolitaireCardStack.Talon;
+}
+function isFoundationStack(value: string): boolean {
+  return objectHasValue(OSolitaireFoundationStack, value);
+}
+function isTableauStack(value: string): boolean {
+  return objectHasValue(OSolitaireTableauStack, value);
+}
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
 
@@ -97,6 +110,20 @@ class SolitaireContextData implements PlayingCardsContextListener {
 
   public onValidDrop(card: PlayingCardStackInfo, slot: PlayingCardStackInfo) {
     console.log(`onValidDrop: ${card.stackId}:${card.cardIndex} -> ${slot && slot.stackId}:${slot && slot.cardIndex}`);
+    if (isTableauStack(card.stackId)) {
+      if (isTableauStack(slot.stackId)) {
+        console.log('tableau -> tableau');
+        // TODO
+      } else if (isFoundationStack(slot.stackId)) {
+        console.log('tableau -> foundation');
+        // TODO
+      }
+    } else if (isTalonStack(card.stackId)) {
+      if (isTableauStack(slot.stackId)) {
+        console.log('talon -> tableau');
+        // TODO
+      }
+    }
   }
   public onInvalidDrop(card: PlayingCardStackInfo) {
     console.log(`onInvalidDrop: ${card.stackId}:${card.cardIndex}`);

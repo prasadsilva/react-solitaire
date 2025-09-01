@@ -15,3 +15,7 @@ export function deepFreeze<T>(obj: T) {
   }
   return Object.freeze(obj);
 }
+
+export function objectHasValue<T>(object: { [key: string]: T }, value: T) {
+  return Object.values(object).includes(value);
+}
