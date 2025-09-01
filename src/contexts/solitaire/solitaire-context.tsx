@@ -75,6 +75,7 @@ function useTalon() {
 
   const handleContextChange = useCallback(
     (modelChanged: boolean) => {
+      // TODO: It would be better to know if only the data we cared about changed
       if (modelChanged) {
         setTalonCards(context.getTalon().cards);
       } else {
@@ -108,6 +109,7 @@ function useTableau(id: SolitaireTableauStack) {
 
   const handleContextChange = useCallback(
     (modelChanged: boolean) => {
+      // TODO: It would be better to know if only the data we cared about changed
       if (modelChanged) {
         setTableauCards(context.getStack(id).cards);
       } else {
@@ -141,6 +143,7 @@ function useFoundation(id: SolitaireFoundationStack) {
 
   const handleContextChange = useCallback(
     (modelChanged: boolean) => {
+      // TODO: It would be better to know if only the data we cared about changed
       if (modelChanged) {
         setFoundationCards(context.getStack(id).cards);
       } else {

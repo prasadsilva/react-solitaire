@@ -92,23 +92,93 @@ export class SolitaireContextData implements PlayingCardsContextListener {
 
   public onValidDrop(card: PlayingCardStackInfo, slot: PlayingCardStackInfo) {
     console.log(`onValidDrop: ${card.stackId}:${card.cardIndex} -> ${slot && slot.stackId}:${slot && slot.cardIndex}`);
+    let result = false;
     if (isTableauStack(card.stackId)) {
       if (isTableauStack(slot.stackId)) {
         console.log('tableau -> tableau');
-        // TODO
+        // TODO: Need check logic
+        result = this.moveBetweenStacks(card, slot);
       } else if (isFoundationStack(slot.stackId)) {
         console.log('tableau -> foundation');
-        // TODO
+        // TODO: Need check logic
+        result = this.moveBetweenStacks(card, slot);
       }
     } else if (isTalonStack(card.stackId)) {
       if (isTableauStack(slot.stackId)) {
         console.log('talon -> tableau');
-        // TODO
+        // TODO: Need check logic
+        result = this.moveBetweenStacks(card, slot);
       }
     }
+    this.notifyContextStateChange(result);
   }
   public onInvalidDrop(card: PlayingCardStackInfo) {
     console.log(`onInvalidDrop: ${card.stackId}:${card.cardIndex}`);
+    this.notifyContextStateChange(false);
+  }
+
+  private moveBetweenStacks(card: PlayingCardStackInfo, slot: PlayingCardStackInfo): boolean {
+    const sourceStackId = card.stackId;
+    const sourceStackCardIndex = card.cardIndex;
+    const sourceStack = this.cardStacks[card.stackId];
+    const targetStackId = slot.stackId;
+    const targetStackCardIndex = slot.cardIndex;
+
+    switch (sourceStack.meta.moveBehavior) {
+      case OPlayingCardStackMoveBehavior.MoveAllNextSiblings: {
+        // Remove card and next siblings below from source stack
+        const sourceStackCopy = { ...this.cardStacks[sourceStackId] };
+        const sourceStackCardsCopy = sourceStackCopy.cards.slice(0, sourceStackCardIndex);
+        const cardsToMove = sourceStackCopy.cards.slice(sourceStackCardIndex);
+        if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
+          console.warn('Something went wrong with card removal');
+        }
+        sourceStackCopy.cards = sourceStackCardsCopy;
+        this.cardStacks[sourceStackId] = sourceStackCopy;
+
+        // Add card and next siblings to target stack
+        const targetStackCopy = { ...this.cardStacks[targetStackId] };
+        const targetStackCardsCopy = [...targetStackCopy.cards];
+        targetStackCardsCopy.splice(targetStackCardIndex, 0, ...cardsToMove);
+        targetStackCopy.cards = targetStackCardsCopy;
+        this.cardStacks[targetStackId] = targetStackCopy;
+
+        break;
+      }
+      case OPlayingCardStackMoveBehavior.MoveOnlyTop: {
+        if (sourceStackCardIndex != sourceStack.cards.length - 1) {
+          console.warn('Move only top constraint failed');
+          return false;
+        }
+
+        // Remove only the one card from source stack
+        const sourceStackCopy = { ...this.cardStacks[sourceStackId] };
+        const sourceStackCardsCopy = [...sourceStackCopy.cards];
+        const cardsToMove = sourceStackCardsCopy.splice(sourceStackCardIndex, 1);
+        if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
+          console.warn('Something went wrong with card removal');
+        }
+        sourceStackCopy.cards = sourceStackCardsCopy;
+        this.cardStacks[sourceStackId] = sourceStackCopy;
+
+        // Add the one card to the target stack
+        const targetStackCopy = { ...this.cardStacks[targetStackId] };
+        const targetStackCardsCopy = [...targetStackCopy.cards];
+        targetStackCardsCopy.splice(targetStackCardIndex, 0, ...cardsToMove);
+        targetStackCopy.cards = targetStackCardsCopy;
+        this.cardStacks[targetStackId] = targetStackCopy;
+        break;
+      }
+      case OPlayingCardStackMoveBehavior.MoveIndividually: {
+        console.warn(`Unhandled move mode ${OPlayingCardStackMoveBehavior.MoveIndividually}`);
+        return false;
+      }
+      case OPlayingCardStackMoveBehavior.Immovable: {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private registerStack(
