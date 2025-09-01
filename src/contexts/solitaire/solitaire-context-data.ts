@@ -12,8 +12,8 @@ import {
   type SolitaireCardStack,
 } from '@/data/types';
 import { objectHasValue } from '@/lib/utils';
+import type { PlayingCardsContextListener } from '../playing-cards/playing-cards-context';
 import { generateNewSolitaireGameData } from './deck-builder';
-import type { PlayingCardsContextListener } from './playing-cards-context';
 
 function isTalonStack(value: string): boolean {
   return value == OSolitaireCardStack.Talon;

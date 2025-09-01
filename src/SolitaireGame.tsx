@@ -1,8 +1,8 @@
 import { SolitaireCanvas } from '@/components/solitaire-game/SolitaireCanvas';
 import { ThemeProvider, ThemeToggle } from '@/components/theme';
 import { Button } from '@/components/ui/button';
-import { createNewPlayingCardsContextValue, PlayingCardsContext } from './utils/playing-cards-context';
-import { createNewSolitaireContextValue, SolitaireContext } from './utils/solitaire-context';
+import { createNewPlayingCardsContextValue, PlayingCardsContext } from './contexts/playing-cards/playing-cards-context';
+import { createNewSolitaireContextValue, SolitaireContext } from './contexts/solitaire/solitaire-context';
 
 function SolitaireGame() {
   return (
