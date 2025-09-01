@@ -10,6 +10,7 @@ import {
   type PlayingCardStackDropBehavior,
   type PlayingCardStackInfo,
   type SolitaireCardStack,
+  type SolitaireFoundationStack,
   type SolitaireTableauStack,
 } from '@/data/types';
 import { objectHasValue } from '@/lib/utils';
@@ -44,26 +45,10 @@ class SolitaireContextData implements PlayingCardsContextListener {
       newSolitaireGameData.drawCards,
     );
     this.registerStack(OSolitaireCardStack.Talon, OPlayingCardStackMoveBehavior.MoveOnlyTop, OPlayingCardStackDropBehavior.NotAccepting);
-    this.registerStack(
-      OSolitaireCardStack.Foundation1,
-      OPlayingCardStackMoveBehavior.Immovable,
-      OPlayingCardStackDropBehavior.NotAccepting,
-    );
-    this.registerStack(
-      OSolitaireCardStack.Foundation2,
-      OPlayingCardStackMoveBehavior.Immovable,
-      OPlayingCardStackDropBehavior.NotAccepting,
-    );
-    this.registerStack(
-      OSolitaireCardStack.Foundation3,
-      OPlayingCardStackMoveBehavior.Immovable,
-      OPlayingCardStackDropBehavior.NotAccepting,
-    );
-    this.registerStack(
-      OSolitaireCardStack.Foundation4,
-      OPlayingCardStackMoveBehavior.Immovable,
-      OPlayingCardStackDropBehavior.NotAccepting,
-    );
+    this.registerStack(OSolitaireCardStack.Foundation1, OPlayingCardStackMoveBehavior.Immovable, OPlayingCardStackDropBehavior.AcceptsAny);
+    this.registerStack(OSolitaireCardStack.Foundation2, OPlayingCardStackMoveBehavior.Immovable, OPlayingCardStackDropBehavior.AcceptsAny);
+    this.registerStack(OSolitaireCardStack.Foundation3, OPlayingCardStackMoveBehavior.Immovable, OPlayingCardStackDropBehavior.AcceptsAny);
+    this.registerStack(OSolitaireCardStack.Foundation4, OPlayingCardStackMoveBehavior.Immovable, OPlayingCardStackDropBehavior.AcceptsAny);
     this.registerStack(
       OSolitaireCardStack.Tableau1,
       OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
@@ -215,7 +200,7 @@ export function SolitaireContext({ children, value }: React.ProviderProps<Solita
 function useStock() {
   const context = useContext(SolitaireContextImpl);
   if (!context) {
-    throw new Error('useDrawPile must be used within a SolitaireContext');
+    throw new Error('useStock must be used within a SolitaireContext');
   }
   const [stock, setStock] = useState(context.getStock().cards);
   const drawPileCount = useMemo(() => stock.length, [stock]);
@@ -256,7 +241,7 @@ function useStock() {
 function useTalon() {
   const context = useContext(SolitaireContextImpl);
   if (!context) {
-    throw new Error('useDiscardPile must be used within a SolitaireContext');
+    throw new Error('useTalon must be used within a SolitaireContext');
   }
   const talonMeta = useMemo(() => context.getTalon().meta, [context]);
   const [talonCards, setTalonCards] = useState(context.getTalon().cards);
@@ -292,7 +277,7 @@ function useTalon() {
 function useTableau(id: SolitaireTableauStack) {
   const context = useContext(SolitaireContextImpl);
   if (!context) {
-    throw new Error('useDiscardPile must be used within a SolitaireContext');
+    throw new Error('useTableau must be used within a SolitaireContext');
   }
   const tableauMeta = useMemo(() => context.getStack(id).meta, [context]);
   const [tableauCards, setTableauCards] = useState(context.getStack(id).cards);
@@ -320,8 +305,43 @@ function useTableau(id: SolitaireTableauStack) {
   };
 }
 
+function useFoundation(id: SolitaireFoundationStack) {
+  const context = useContext(SolitaireContextImpl);
+  if (!context) {
+    throw new Error('useFoundationPile must be used within a SolitaireContext');
+  }
+  const foundationMeta = useMemo(() => context.getStack(id).meta, [context]);
+  const [foundationCards, setFoundationCards] = useState(context.getStack(id).cards);
+  const foundationCount = useMemo(() => foundationCards.length, [foundationCards]);
+  const topCard = useMemo(() => (foundationCards.length > 0 ? foundationCards[foundationCards.length - 1] : null), [foundationCards]);
+
+  const handleContextChange = useCallback(
+    (modelChanged: boolean) => {
+      if (modelChanged) {
+        setFoundationCards(context.getStack(id).cards);
+      } else {
+        // We are here because of an aborted action. Reset the state to cause a re-render
+        setFoundationCards([...context.getStack(id).cards]);
+      }
+    },
+    [context],
+  );
+
+  useEffect(() => {
+    context.addChangeListener(handleContextChange);
+    return () => context.removeChangeListener(handleContextChange);
+  }, [context]);
+
+  return {
+    foundationMeta,
+    foundationCount,
+    topCard,
+  };
+}
+
 export const SolitaireHooks = {
   useStock,
   useTalon,
   useTableau,
+  useFoundation,
 };

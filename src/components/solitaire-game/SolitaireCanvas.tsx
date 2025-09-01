@@ -1,11 +1,11 @@
 import { LAYOUT_CONSTANTS } from '@/data/constants';
-import { OSolitaireTableauStack } from '@/data/types';
+import { OSolitaireFoundationStack, OSolitaireTableauStack } from '@/data/types';
 import type { Immutable } from '@/lib';
 import { PlayingCardsHooks } from '@/utils/playing-cards-context';
 import { type ComponentProps } from 'react';
 import { DiscardPile } from '../DiscardPile';
 import { DrawPile } from '../DrawPile';
-import { PlayingCardsPile } from '../PlayingCardsPile';
+import { FoundationPile } from '../FoundationPile';
 import { TableauPile } from '../TableauPile';
 
 export type SolitaireCanvasProps = Immutable<{}> & ComponentProps<'div'>;
@@ -18,10 +18,10 @@ export function SolitaireCanvas({}: SolitaireCanvasProps) {
         <>
           <DrawPile id="stock-pile" position={{ x: 20, y: 20 }} />
           <DiscardPile id="talon-pile" position={{ x: 140, y: 20 }} />
-          <PlayingCardsPile id="foundation-pile-1" position={{ x: 340, y: 20 }} showingFace count={0} />
-          <PlayingCardsPile id="foundation-pile-2" position={{ x: 460, y: 20 }} showingFace count={0} />
-          <PlayingCardsPile id="foundation-pile-3" position={{ x: 580, y: 20 }} showingFace count={0} />
-          <PlayingCardsPile id="foundation-pile-4" position={{ x: 700, y: 20 }} showingFace count={0} />
+          <FoundationPile id="foundation-pile-1" foundationId={OSolitaireFoundationStack.Foundation1} position={{ x: 340, y: 20 }} />
+          <FoundationPile id="foundation-pile-2" foundationId={OSolitaireFoundationStack.Foundation2} position={{ x: 460, y: 20 }} />
+          <FoundationPile id="foundation-pile-3" foundationId={OSolitaireFoundationStack.Foundation3} position={{ x: 580, y: 20 }} />
+          <FoundationPile id="foundation-pile-4" foundationId={OSolitaireFoundationStack.Foundation4} position={{ x: 700, y: 20 }} />
           <TableauPile
             id="tableau-pile-1"
             tableauId={OSolitaireTableauStack.Tableau1}
