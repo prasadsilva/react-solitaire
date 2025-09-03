@@ -4,14 +4,18 @@ import {
   OSolitaireCardStack,
   OSolitaireFoundationStack,
   OSolitaireTableauStack,
+  OSuit,
+  OSuitColor,
   type PlayingCardDescriptor,
   type PlayingCardStackBehavior,
   type PlayingCardStackData,
   type PlayingCardStackDropBehavior,
   type PlayingCardStackInfo,
   type SolitaireCardStack,
+  type Suit,
+  type SuitColor,
 } from '@/data/types';
-import { objectHasValue } from '@/lib/utils';
+import { notNull, objectHasValue } from '@/lib/utils';
 import type { PlayingCardsContextListener } from '../playing-cards/playing-cards-context';
 import { generateNewSolitaireGameData } from './deck-builder';
 
@@ -23,6 +27,38 @@ function isFoundationStack(value: string): boolean {
 }
 function isTableauStack(value: string): boolean {
   return objectHasValue(OSolitaireTableauStack, value);
+}
+
+function getSuitColor(suit: Suit): SuitColor {
+  switch (suit) {
+    case OSuit.Clubs:
+      return OSuitColor.Black;
+    case OSuit.Spades:
+      return OSuitColor.Black;
+    case OSuit.Hearts:
+      return OSuitColor.Red;
+    case OSuit.Diamonds:
+      return OSuitColor.Red;
+  }
+}
+
+function isSameColor(card1: PlayingCardDescriptor, card2: PlayingCardDescriptor) {
+  console.log(`checking color: ${getSuitColor(card1.suit)} == ${getSuitColor(card2.suit)}`);
+  return getSuitColor(card1.suit) == getSuitColor(card2.suit);
+}
+
+function isSameSuit(card1: PlayingCardDescriptor, card2: PlayingCardDescriptor) {
+  console.log(`checking suit: ${card1.suit} == ${card2.suit}`);
+  return card1.suit === card2.suit;
+}
+
+function isNextInRank(card1: PlayingCardDescriptor, card2: PlayingCardDescriptor) {
+  console.log(`checking next in rank: ${card1.rank} -> ${card2.rank}`);
+  return card1.rank === card2.rank - 1;
+}
+
+function isAceRank(card: PlayingCardDescriptor) {
+  return card.rank === 0;
 }
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
@@ -90,24 +126,112 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     );
   }
 
-  public onValidDrop(card: PlayingCardStackInfo, slot: PlayingCardStackInfo) {
-    console.log(`onValidDrop: ${card.stackId}:${card.cardIndex} -> ${slot && slot.stackId}:${slot && slot.cardIndex}`);
+  private hasCards(stackId: string): boolean {
+    const stack = this.getStack(stackId);
+    if (!stack) {
+      console.error('Invalid card stack: 1');
+      return false;
+    }
+    return stack.cards.length > 0;
+  }
+
+  private isTopCard(stackId: string, cardIdx: number): boolean {
+    const stack = this.getStack(stackId);
+    if (!stack) {
+      console.error('Invalid card stack: 1');
+      return false;
+    }
+    return stack.cards.length - 1 === cardIdx;
+  }
+
+  private getCard(stackId: string, cardIdx: number): PlayingCardDescriptor | null {
+    const stack = this.getStack(stackId);
+    if (!stack) {
+      console.error('Invalid card stack: 1');
+      return null;
+    }
+    if (cardIdx < 0 || cardIdx >= stack.cards.length) {
+      console.error('Invalid card index: 1');
+      return null;
+    }
+    const card = stack.cards[cardIdx];
+    if (!card) {
+      console.error(`Card not found at index ${cardIdx}`);
+      return null;
+    }
+    return card;
+  }
+
+  public onValidDrop(cardStackInfo: PlayingCardStackInfo, slotStackInfo: PlayingCardStackInfo) {
+    console.log(
+      `onValidDrop: ${cardStackInfo.stackId}:${cardStackInfo.cardIndex} -> ${slotStackInfo && slotStackInfo.stackId}:${slotStackInfo && slotStackInfo.cardIndex}`,
+    );
     let result = false;
-    if (isTableauStack(card.stackId)) {
-      if (isTableauStack(slot.stackId)) {
+    if (isTableauStack(cardStackInfo.stackId)) {
+      if (isTableauStack(slotStackInfo.stackId)) {
         console.log('tableau -> tableau');
-        // TODO: Need check logic
-        result = this.moveBetweenStacks(card, slot);
-      } else if (isFoundationStack(slot.stackId)) {
+        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        if (!slotHasCards) {
+          // No parent card; empty slot. Drop is always successful.
+          result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+        } else if (card) {
+          const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
+          if (!isSameColor(card, slotParentCard) && isNextInRank(card, slotParentCard)) {
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+          }
+        }
+      } else if (isFoundationStack(slotStackInfo.stackId) && this.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
         console.log('tableau -> foundation');
-        // TODO: Need check logic
-        result = this.moveBetweenStacks(card, slot);
+        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        if (!slotHasCards) {
+          console.log(card);
+          // No parent card; empty slot. Drop is only successful if it is an ace.
+          if (card && isAceRank(card)) {
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+          }
+        } else if (card) {
+          const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          console.log(slotParentCard);
+          // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
+          if (isSameSuit(card, slotParentCard) && isNextInRank(slotParentCard, card)) {
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+          }
+        }
       }
-    } else if (isTalonStack(card.stackId)) {
-      if (isTableauStack(slot.stackId)) {
+    } else if (isTalonStack(cardStackInfo.stackId)) {
+      if (isTableauStack(slotStackInfo.stackId)) {
         console.log('talon -> tableau');
-        // TODO: Need check logic
-        result = this.moveBetweenStacks(card, slot);
+        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        if (!slotHasCards) {
+          // No parent card; empty slot. Drop is always successful.
+          result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+        } else if (card) {
+          const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
+          if (!isSameColor(card, slotParentCard) && isNextInRank(card, slotParentCard)) {
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+          }
+        }
+      } else if (isFoundationStack(slotStackInfo.stackId) && this.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
+        console.log('talon -> foundation');
+        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        if (!slotHasCards) {
+          // No parent card; empty slot. Drop is only successful if it is an ace.
+          if (card && isAceRank(card)) {
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+          }
+        } else if (card) {
+          const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
+          if (isSameSuit(card, slotParentCard) && isNextInRank(slotParentCard, card)) {
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+          }
+        }
       }
     }
     this.notifyContextStateChange(result);
