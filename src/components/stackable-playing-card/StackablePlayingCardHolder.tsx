@@ -10,7 +10,7 @@ export function StackablePlayingCardHolder({ data, view, index, dataIndex, hidde
   }
 
   if (data.meta.dropBehavior === OPlayingCardStackDropBehavior.AcceptsAny) {
-    const droptargetStackInfo = { stackId: data.meta.id, cardIndex: data.cards.length };
+    const droptargetStackInfo = { stackId: data.meta.id, cardIndex: dataIndex };
     return <StackablePlayingCardDropTarget stackInfo={droptargetStackInfo} position={view.position} />;
   }
 }
