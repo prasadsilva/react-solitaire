@@ -15,7 +15,9 @@ export function StackablePlayingCard({ data, view, index, dataIndex, hidden }: P
   // console.log(`card.dataIndex[${data.meta.id}]: ${dataIndex}`);
 
   // TODO: These could be moved into the hook?
-  const isDraggable = data.meta.moveBehavior !== OPlayingCardStackMoveBehavior.MoveOnlyTop || index === data.cards.length - 1;
+  const isDraggable =
+    data.meta.moveBehavior !== OPlayingCardStackMoveBehavior.Immovable &&
+    (data.meta.moveBehavior !== OPlayingCardStackMoveBehavior.MoveOnlyTop || index === data.cards.length - 1);
   const nextSiblingStaticView = useMemo(
     () => ({
       ...view,
