@@ -19,3 +19,10 @@ export function deepFreeze<T>(obj: T) {
 export function objectHasValue<T>(object: { [key: string]: T }, value: T) {
   return Object.values(object).includes(value);
 }
+
+export function notNull<T>(value: T | null | undefined): NonNullable<T> {
+  if (value === null) {
+    throw new Error('Value is expected to be not null!');
+  }
+  return value as NonNullable<T>;
+}
