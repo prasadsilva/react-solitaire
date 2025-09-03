@@ -1,5 +1,11 @@
 // NOTE: This file cannot be .d.ts. We are exporting an object.
 
+export const OSuitColor = {
+  Red: 0,
+  Black: 1,
+} as const;
+export type SuitColor = (typeof OSuitColor)[keyof typeof OSuitColor];
+
 // https://www.typescriptlang.org/docs/handbook/enums.html#objects-vs-enums
 export const OSuit = {
   Clubs: 0,
