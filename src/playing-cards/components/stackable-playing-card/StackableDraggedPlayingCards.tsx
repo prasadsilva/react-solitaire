@@ -1,4 +1,4 @@
-import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
+import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/solitaire/context/constants';
 import { cn } from '@/utils';
 import type { StackablePlayingCardProps } from './types';
 

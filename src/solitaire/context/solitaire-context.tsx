@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { PlayingCardsContext } from '../playing-cards/playing-cards-context';
+import { PlayingCardsContext } from '../../playing-cards/context/playing-cards-context';
 import { SolitaireContextData } from './solitaire-context-data';
 import { type SolitaireFoundationStack, type SolitaireTableauStack } from './types';
 

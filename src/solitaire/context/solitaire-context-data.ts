@@ -11,9 +11,9 @@ import {
   type PlayingCardStackInfo,
   type Suit,
   type SuitColor,
-} from '@/contexts/playing-cards/types';
+} from '@/playing-cards/context/types';
 import { notNull, objectHasValue } from '@/utils';
-import type { PlayingCardsContextListener } from '../playing-cards/playing-cards-context';
+import type { PlayingCardsContextListener } from '../../playing-cards/context/playing-cards-context';
 import { generateNewSolitaireGameData } from './deck-builder';
 import { OSolitaireCardStack, OSolitaireFoundationStack, OSolitaireTableauStack, type SolitaireCardStack } from './types';
 

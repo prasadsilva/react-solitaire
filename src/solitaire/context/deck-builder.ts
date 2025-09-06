@@ -1,5 +1,5 @@
-import { AllCardsC, AllCardsD, AllCardsH, AllCardsS } from '@/contexts/playing-cards/card-meta';
-import { type PlayingCardList } from '@/contexts/playing-cards/types';
+import { AllCardsC, AllCardsD, AllCardsH, AllCardsS } from '@/playing-cards/context/card-meta';
+import { type PlayingCardList } from '@/playing-cards/context/types';
 import { OSolitaireTableauStack, type SolitaireTableauStack } from './types';
 
 interface NewSolitaireGameData {

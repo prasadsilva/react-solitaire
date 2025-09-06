@@ -1,8 +1,8 @@
-import type { PlayingCanvasPosition, PlayingCardStackData, PlayingCardStackView } from '@/contexts/playing-cards/types';
-import { LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
-import { SolitaireHooks } from '@/contexts/solitaire/solitaire-context';
-import type { SolitaireTableauStack } from '@/contexts/solitaire/types';
 import { StackablePlayingCards } from '@/playing-cards/components/stackable-playing-card';
+import type { PlayingCanvasPosition, PlayingCardStackData, PlayingCardStackView } from '@/playing-cards/context/types';
+import { LAYOUT_CONSTANTS } from '@/solitaire/context/constants';
+import { SolitaireHooks } from '@/solitaire/context/solitaire-context';
+import type { SolitaireTableauStack } from '@/solitaire/context/types';
 import type { Immutable } from '@/utils';
 import { useMemo, type ComponentProps } from 'react';
 

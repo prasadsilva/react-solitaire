@@ -1,7 +1,7 @@
-import { PlayingCardsHooks } from '@/contexts/playing-cards/playing-cards-context';
-import type { PlayingCanvasPosition, PlayingCardStackInfo } from '@/contexts/playing-cards/types';
-import { CARD_DIMS_CLASS } from '@/contexts/solitaire/constants';
 import CardDropTarget from '@/playing-cards/assets/droptarget.svg?react';
+import { PlayingCardsHooks } from '@/playing-cards/context/playing-cards-context';
+import type { PlayingCanvasPosition, PlayingCardStackInfo } from '@/playing-cards/context/types';
+import { CARD_DIMS_CLASS } from '@/solitaire/context/constants';
 import { cn, type Immutable } from '@/utils';
 import { type ComponentProps } from 'react';
 

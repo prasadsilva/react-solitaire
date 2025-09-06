@@ -1,5 +1,5 @@
-import { OPlayingCardStackDropBehavior } from '@/contexts/playing-cards/types';
 import { StackablePlayingCardDropTarget } from '@/playing-cards/components/stackable-playing-card/StackablePlayingCardDropTarget';
+import { OPlayingCardStackDropBehavior } from '@/playing-cards/context/types';
 import { StackablePlayingCard } from './StackablePlayingCard';
 import type { StackablePlayingCardProps } from './types';
 

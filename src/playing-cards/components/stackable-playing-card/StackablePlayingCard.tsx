@@ -1,7 +1,7 @@
-import { PlayingCardsHooks } from '@/contexts/playing-cards/playing-cards-context';
-import { OPlayingCardStackMoveBehavior } from '@/contexts/playing-cards/types';
-import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
 import CardBack from '@/playing-cards/assets/1B.svg';
+import { PlayingCardsHooks } from '@/playing-cards/context/playing-cards-context';
+import { OPlayingCardStackMoveBehavior } from '@/playing-cards/context/types';
+import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/solitaire/context/constants';
 import { cn } from '@/utils';
 import { useMemo } from 'react';
 import { StackableDraggedPlayingCards } from './StackableDraggedPlayingCards';

@@ -1,8 +1,8 @@
-import type { PlayingCanvasPosition } from '@/contexts/playing-cards/types';
-import { CARD_DIMS_CLASS } from '@/contexts/solitaire/constants';
-import { SolitaireHooks } from '@/contexts/solitaire/solitaire-context';
 import CardBack from '@/playing-cards/assets/1B.svg';
 import CardOutline from '@/playing-cards/assets/outline.svg?react';
+import type { PlayingCanvasPosition } from '@/playing-cards/context/types';
+import { CARD_DIMS_CLASS } from '@/solitaire/context/constants';
+import { SolitaireHooks } from '@/solitaire/context/solitaire-context';
 import { cn, type Immutable } from '@/utils';
 import { useCallback, useMemo, type ComponentProps } from 'react';
 

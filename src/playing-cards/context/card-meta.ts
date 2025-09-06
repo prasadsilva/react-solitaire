@@ -1,4 +1,4 @@
-import { OSuit, type PlayingCardMeta } from '@/contexts/playing-cards/types';
+import { OSuit, type PlayingCardMeta } from '@/playing-cards/context/types';
 import {
   Card2CSvg,
   Card2DSvg,

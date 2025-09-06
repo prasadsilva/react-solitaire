@@ -1,6 +1,6 @@
-import { PlayingCardsHooks } from '@/contexts/playing-cards/playing-cards-context';
-import { LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
-import { OSolitaireFoundationStack, OSolitaireTableauStack } from '@/contexts/solitaire/types';
+import { PlayingCardsHooks } from '@/playing-cards/context/playing-cards-context';
+import { LAYOUT_CONSTANTS } from '@/solitaire/context/constants';
+import { OSolitaireFoundationStack, OSolitaireTableauStack } from '@/solitaire/context/types';
 import type { Immutable } from '@/utils';
 import { type ComponentProps } from 'react';
 import { DiscardPile } from './DiscardPile';

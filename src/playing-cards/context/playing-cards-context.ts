@@ -1,7 +1,7 @@
-import { type PlayingCanvasPosition, type PlayingCardStackInfo } from '@/contexts/playing-cards/types';
+import { DragManager } from '@/playing-cards/context/dragmanager';
+import { type PlayingCanvasPosition, type PlayingCardStackInfo } from '@/playing-cards/context/types';
 import type { Immutable } from '@/utils';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { DragManager } from './dragmanager';
 
 export interface PlayingCardsContextListener {
   onValidDrop: (card: PlayingCardStackInfo, slot: PlayingCardStackInfo) => void;

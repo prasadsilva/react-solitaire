@@ -1,9 +1,9 @@
 import { ThemeProvider, ThemeToggle } from '@/components/theme';
 import { Button } from '@/components/ui/button';
+import { createNewPlayingCardsContextValue, PlayingCardsContext } from '@/playing-cards/context/playing-cards-context';
 import { SolitaireCanvas } from '@/solitaire/components/SolitaireCanvas';
+import { createNewSolitaireContextValue, SolitaireContext } from '@/solitaire/context/solitaire-context';
 import { useCallback, useState } from 'react';
-import { createNewPlayingCardsContextValue, PlayingCardsContext } from '../../contexts/playing-cards/playing-cards-context';
-import { createNewSolitaireContextValue, SolitaireContext } from '../../contexts/solitaire/solitaire-context';
 
 function SolitaireGame() {
   const [solitaireGame, setSolitaireGame] = useState(createNewSolitaireContextValue());

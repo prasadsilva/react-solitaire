@@ -1,4 +1,4 @@
-import type { PlayingCardStackData, PlayingCardStackView } from '@/contexts/playing-cards/types';
+import type { PlayingCardStackData, PlayingCardStackView } from '@/playing-cards/context/types';
 
 export type StackablePlayingCardProps = {
   data: PlayingCardStackData;
