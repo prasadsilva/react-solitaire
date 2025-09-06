@@ -1,7 +1,7 @@
 import { type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackView } from '@/contexts/playing-cards/types';
 import { LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
 import { SolitaireHooks } from '@/contexts/solitaire/solitaire-context';
-import type { Immutable } from '@/lib';
+import type { Immutable } from '@/utils';
 import { useEffect, useMemo, useState, type ComponentProps } from 'react';
 import { StackablePlayingCards } from './stackable-playing-card';
 

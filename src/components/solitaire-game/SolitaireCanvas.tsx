@@ -1,7 +1,7 @@
 import { PlayingCardsHooks } from '@/contexts/playing-cards/playing-cards-context';
 import { LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
 import { OSolitaireFoundationStack, OSolitaireTableauStack } from '@/contexts/solitaire/types';
-import type { Immutable } from '@/lib';
+import type { Immutable } from '@/utils';
 import { type ComponentProps } from 'react';
 import { DiscardPile } from '../DiscardPile';
 import { DrawPile } from '../DrawPile';

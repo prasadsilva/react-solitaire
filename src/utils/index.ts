@@ -1,6 +1,11 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+export type Immutable<T> = {
+  readonly [K in keyof T]: Immutable<T[K]>;
+};
+
+// Shadcn created helper
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

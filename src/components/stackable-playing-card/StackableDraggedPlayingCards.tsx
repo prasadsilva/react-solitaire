@@ -1,5 +1,5 @@
 import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 import type { StackablePlayingCardProps } from './types';
 
 // NOTE: Dragged playing cards are expected to be showing face (including siblings)

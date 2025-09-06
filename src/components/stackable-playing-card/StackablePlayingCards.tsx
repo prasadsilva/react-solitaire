@@ -1,6 +1,6 @@
 import { CARD_DIMS_CLASS } from '@/contexts/solitaire/constants';
-import { cn } from '@/lib/utils';
 import CardOutline from '@/playing-cards/assets/outline.svg?react';
+import { cn } from '@/utils';
 import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
 import type { StackablePlayingCardsStackProps } from './types';
 
