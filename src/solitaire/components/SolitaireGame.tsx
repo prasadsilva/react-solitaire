@@ -13,14 +13,13 @@ function SolitaireGame() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div id="viewport" className="absolute w-screen h-screen bg-background flex flex-col">
-        <div
-          id="title-bar"
-          className="w-full h-fit bg-neutral-200 dark:bg-neutral-700 flex flex-row gap-2 p-2 items-center shadow-sm shadow-gray-500 dark:shadow-gray-800"
-        >
-          <div className="flex-2">React Solitaire</div>
-          <Button onClick={startNewGame}>New Game</Button>
-          <ThemeToggle className="w-9 h-9" />
+      <div id="viewport" className="absolute w-screen h-screen min-w-[820px] bg-background flex flex-col">
+        <div id="title-bar" className="w-full h-fit bg-neutral-200 dark:bg-neutral-700 shadow-sm shadow-gray-500 dark:shadow-gray-800">
+          <div id="title-bar-content" className="max-w-[820px] flex flex-row gap-2 p-2 items-center">
+            <div className="flex-2">React Solitaire</div>
+            <Button onClick={startNewGame}>New Game</Button>
+            <ThemeToggle className="w-9 h-9" />
+          </div>
         </div>
         <div id="canvas-area" className="flex-2">
           <PlayingCardsContext value={createNewPlayingCardsContextValue()}>
