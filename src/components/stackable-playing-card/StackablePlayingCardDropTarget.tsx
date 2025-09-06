@@ -1,9 +1,9 @@
-import CardDropTarget from '@/assets/droptarget.svg?react';
 import { PlayingCardsHooks } from '@/contexts/playing-cards/playing-cards-context';
 import type { PlayingCanvasPosition, PlayingCardStackInfo } from '@/contexts/playing-cards/types';
 import { CARD_DIMS_CLASS } from '@/contexts/solitaire/constants';
 import type { Immutable } from '@/lib';
 import { cn } from '@/lib/utils';
+import CardDropTarget from '@/playing-cards/assets/droptarget.svg?react';
 import { type ComponentProps } from 'react';
 
 export type PlayingCardDropTargetProps = Immutable<{

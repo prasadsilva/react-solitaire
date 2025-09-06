@@ -1,8 +1,8 @@
-import CardBack from '@/assets/1B.svg';
 import { PlayingCardsHooks } from '@/contexts/playing-cards/playing-cards-context';
 import { OPlayingCardStackMoveBehavior } from '@/contexts/playing-cards/types';
 import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
 import { cn } from '@/lib/utils';
+import CardBack from '@/playing-cards/assets/1B.svg';
 import { useMemo } from 'react';
 import { StackableDraggedPlayingCards } from './StackableDraggedPlayingCards';
 import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
