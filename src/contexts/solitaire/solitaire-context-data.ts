@@ -161,73 +161,72 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   }
 
   public onValidDrop(cardStackInfo: PlayingCardStackInfo, slotStackInfo: PlayingCardStackInfo) {
-    console.log(
-      `onValidDrop: ${cardStackInfo.stackId}:${cardStackInfo.cardIndex} -> ${slotStackInfo && slotStackInfo.stackId}:${slotStackInfo && slotStackInfo.cardIndex}`,
-    );
     let result = false;
     if (isTableauStack(cardStackInfo.stackId)) {
+      // Move originated from tableau
       if (isTableauStack(slotStackInfo.stackId)) {
-        console.log('tableau -> tableau');
+        // Target is another tableau
         const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
         const slotHasCards = this.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is always successful.
-          result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+          result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
         } else if (card) {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
           if (!isSameColor(card, slotParentCard) && isNextInRank(card, slotParentCard)) {
-            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
           }
         }
       } else if (isFoundationStack(slotStackInfo.stackId) && this.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
-        console.log('tableau -> foundation');
+        // Target is foundation
         const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
         const slotHasCards = this.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           console.log(card);
           // No parent card; empty slot. Drop is only successful if it is an ace.
           if (card && isAceRank(card)) {
-            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
           }
         } else if (card) {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           console.log(slotParentCard);
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
           if (isSameSuit(card, slotParentCard) && isNextInRank(slotParentCard, card)) {
-            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
           }
         }
       }
     } else if (isTalonStack(cardStackInfo.stackId)) {
+      // Move originated from talon
       if (isTableauStack(slotStackInfo.stackId)) {
-        console.log('talon -> tableau');
+        // Target is tableau
         const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
         const slotHasCards = this.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is always successful.
-          result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+          result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
         } else if (card) {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
           if (!isSameColor(card, slotParentCard) && isNextInRank(card, slotParentCard)) {
-            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         }
       } else if (isFoundationStack(slotStackInfo.stackId) && this.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
-        console.log('talon -> foundation');
+        // Target is foundation
         const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
         const slotHasCards = this.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is only successful if it is an ace.
           if (card && isAceRank(card)) {
-            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         } else if (card) {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
           if (isSameSuit(card, slotParentCard) && isNextInRank(slotParentCard, card)) {
-            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo);
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         }
       }
@@ -235,11 +234,10 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     this.notifyContextStateChange(result);
   }
   public onInvalidDrop(card: PlayingCardStackInfo) {
-    console.log(`onInvalidDrop: ${card.stackId}:${card.cardIndex}`);
     this.notifyContextStateChange(false);
   }
 
-  private moveBetweenStacks(card: PlayingCardStackInfo, slot: PlayingCardStackInfo): boolean {
+  private moveBetweenStacks(card: PlayingCardStackInfo, slot: PlayingCardStackInfo, showCardParent: boolean): boolean {
     const sourceStackId = card.stackId;
     const sourceStackCardIndex = card.cardIndex;
     const sourceStack = this.cardStacks[card.stackId];
@@ -254,6 +252,12 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         const cardsToMove = sourceStackCopy.cards.slice(sourceStackCardIndex);
         if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
           console.warn('Something went wrong with card removal');
+        }
+        if (showCardParent) {
+          const parentCard = sourceStackCardsCopy.pop();
+          if (parentCard) {
+            sourceStackCardsCopy.push({ ...parentCard, showingFace: true });
+          }
         }
         sourceStackCopy.cards = sourceStackCardsCopy;
         this.cardStacks[sourceStackId] = sourceStackCopy;
@@ -279,6 +283,12 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         const cardsToMove = sourceStackCardsCopy.splice(sourceStackCardIndex, 1);
         if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
           console.warn('Something went wrong with card removal');
+        }
+        if (showCardParent) {
+          const parentCard = sourceStackCardsCopy.pop();
+          if (parentCard) {
+            sourceStackCardsCopy.push({ ...parentCard, showingFace: true });
+          }
         }
         sourceStackCopy.cards = sourceStackCardsCopy;
         this.cardStacks[sourceStackId] = sourceStackCopy;
@@ -335,11 +345,9 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     const stock = this.getStock();
     const talon = this.getTalon();
     if (stock.cards.length > 0) {
-      const drawnCards = stock.cards.slice(0, 3);
+      const drawnCards = stock.cards.slice(0, 3).map((card) => ({ ...card, showingFace: true }));
       stock.cards = stock.cards.slice(3);
       talon.cards = [...talon.cards, ...drawnCards];
-      console.log(`stock count: ${stock.cards.length}`);
-      console.log(`talon count: ${talon.cards.length}`);
       this.notifyContextStateChange(true);
     } else {
       this.notifyContextStateChange(false);
@@ -350,7 +358,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     const stock = this.getStock();
     const talon = this.getTalon();
     if (stock.cards.length === 0 && talon.cards.length > 0) {
-      stock.cards = talon.cards;
+      stock.cards = talon.cards.map((card) => ({ ...card, showingFace: false }));
       talon.cards = [];
       this.notifyContextStateChange(true);
     } else {

@@ -30,7 +30,7 @@ export function StackablePlayingCard({ data, view, index, dataIndex, hidden }: S
         y: view.position.y + view.stackedCardOffsetY * (showingFace ? 1 : 0.5),
       },
     }),
-    [view.position],
+    [view.position, showingFace],
   );
   const nextSiblingDragView = {
     ...view,
