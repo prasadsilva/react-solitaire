@@ -1,9 +1,9 @@
 import { type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackView } from '@/contexts/playing-cards/types';
 import { LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
 import { SolitaireHooks } from '@/contexts/solitaire/solitaire-context';
+import { StackablePlayingCards } from '@/playing-cards/components/stackable-playing-card';
 import type { Immutable } from '@/utils';
 import { useEffect, useMemo, useState, type ComponentProps } from 'react';
-import { StackablePlayingCards } from './stackable-playing-card';
 
 export type DiscardPilePileProps = Immutable<{
   position: PlayingCanvasPosition;

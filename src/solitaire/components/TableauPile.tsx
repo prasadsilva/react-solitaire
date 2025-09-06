@@ -2,9 +2,9 @@ import type { PlayingCanvasPosition, PlayingCardStackData, PlayingCardStackView 
 import { LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
 import { SolitaireHooks } from '@/contexts/solitaire/solitaire-context';
 import type { SolitaireTableauStack } from '@/contexts/solitaire/types';
+import { StackablePlayingCards } from '@/playing-cards/components/stackable-playing-card';
 import type { Immutable } from '@/utils';
 import { useMemo, type ComponentProps } from 'react';
-import { StackablePlayingCards } from './stackable-playing-card';
 
 export type TableauPileProps = Immutable<{
   tableauId: SolitaireTableauStack;

@@ -3,10 +3,10 @@ import { LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
 import { OSolitaireFoundationStack, OSolitaireTableauStack } from '@/contexts/solitaire/types';
 import type { Immutable } from '@/utils';
 import { type ComponentProps } from 'react';
-import { DiscardPile } from '../DiscardPile';
-import { DrawPile } from '../DrawPile';
-import { FoundationPile } from '../FoundationPile';
-import { TableauPile } from '../TableauPile';
+import { DiscardPile } from './DiscardPile';
+import { DrawPile } from './DrawPile';
+import { FoundationPile } from './FoundationPile';
+import { TableauPile } from './TableauPile';
 
 export type SolitaireCanvasProps = Immutable<{}> & ComponentProps<'div'>;
 export function SolitaireCanvas({}: SolitaireCanvasProps) {
