@@ -1,12 +1,9 @@
-import CardBack from '@/assets/1B.svg';
 import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
 import { cn } from '@/lib/utils';
 import type { StackablePlayingCardProps } from './types';
 
 // NOTE: Dragged playing cards are expected to be showing face (including siblings)
 export function StackableDraggedPlayingCards({ data, view, index }: Omit<StackablePlayingCardProps, 'dataIndex'>) {
-  const card = data.cards[index];
-
   const cardPositions = [view.position];
   let startPositionX = view.position.x;
   let startPositionY = view.position.y;
@@ -24,11 +21,11 @@ export function StackableDraggedPlayingCards({ data, view, index }: Omit<Stackab
       className="absolute size-fit"
       style={{
         transform: `translateX(${position.x}px) translateY(${position.y}px)`,
-        zIndex: index + LAYOUT_CONSTANTS.DRAG_Z_INDEX_OFFSET,
+        zIndex: index + draggedIdx + LAYOUT_CONSTANTS.DRAG_Z_INDEX_OFFSET,
         pointerEvents: 'none',
       }}
     >
-      <img src={card.showingFace ? card.meta.cardImg : CardBack} className={cn('', CARD_DIMS_CLASS)} draggable={false} />
+      <img src={data.cards[index + draggedIdx].meta.cardImg} className={cn('', CARD_DIMS_CLASS)} draggable={false} />
     </div>
   ));
 }
