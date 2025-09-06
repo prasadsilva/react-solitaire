@@ -1,10 +1,10 @@
 import CardOutline from '@/assets/outline.svg?react';
-import { CARD_DIMS_CLASS } from '@/data/constants';
+import { CARD_DIMS_CLASS } from '@/contexts/solitaire/constants';
 import { cn } from '@/lib/utils';
 import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
-import type { PlayingCardsStackProps } from './types';
+import type { StackablePlayingCardsStackProps } from './types';
 
-export function StackablePlayingCards({ data, view, firstCardDataIndex }: PlayingCardsStackProps) {
+export function StackablePlayingCards({ data, view, firstCardDataIndex }: StackablePlayingCardsStackProps) {
   return (
     <>
       <div

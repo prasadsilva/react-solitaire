@@ -1,7 +1,7 @@
-import { type SolitaireFoundationStack, type SolitaireTableauStack } from '@/data/types';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { PlayingCardsContext } from '../playing-cards/playing-cards-context';
 import { SolitaireContextData } from './solitaire-context-data';
+import { type SolitaireFoundationStack, type SolitaireTableauStack } from './types';
 
 export const createNewSolitaireContextValue = () => new SolitaireContextData();
 const SolitaireContextImpl = createContext<InstanceType<typeof SolitaireContextData> | null>(null);

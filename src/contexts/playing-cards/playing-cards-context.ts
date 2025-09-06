@@ -1,4 +1,4 @@
-import { type PlayingCanvasPosition, type PlayingCardStackInfo } from '@/data/types';
+import { type PlayingCanvasPosition, type PlayingCardStackInfo } from '@/contexts/playing-cards/types';
 import type { Immutable } from '@/lib';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { DragManager } from './dragmanager';

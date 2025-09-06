@@ -1,23 +1,21 @@
 import {
   OPlayingCardStackDropBehavior,
   OPlayingCardStackMoveBehavior,
-  OSolitaireCardStack,
-  OSolitaireFoundationStack,
-  OSolitaireTableauStack,
   OSuit,
   OSuitColor,
-  type PlayingCardDescriptor,
+  type PlayingCard,
+  type PlayingCardList,
   type PlayingCardStackBehavior,
   type PlayingCardStackData,
   type PlayingCardStackDropBehavior,
   type PlayingCardStackInfo,
-  type SolitaireCardStack,
   type Suit,
   type SuitColor,
-} from '@/data/types';
+} from '@/contexts/playing-cards/types';
 import { notNull, objectHasValue } from '@/lib/utils';
 import type { PlayingCardsContextListener } from '../playing-cards/playing-cards-context';
 import { generateNewSolitaireGameData } from './deck-builder';
+import { OSolitaireCardStack, OSolitaireFoundationStack, OSolitaireTableauStack, type SolitaireCardStack } from './types';
 
 function isTalonStack(value: string): boolean {
   return value == OSolitaireCardStack.Talon;
@@ -42,23 +40,23 @@ function getSuitColor(suit: Suit): SuitColor {
   }
 }
 
-function isSameColor(card1: PlayingCardDescriptor, card2: PlayingCardDescriptor) {
-  console.log(`checking color: ${getSuitColor(card1.suit)} == ${getSuitColor(card2.suit)}`);
-  return getSuitColor(card1.suit) == getSuitColor(card2.suit);
+function isSameColor(card1: PlayingCard, card2: PlayingCard) {
+  console.log(`checking color: ${getSuitColor(card1.meta.suit)} == ${getSuitColor(card2.meta.suit)}`);
+  return getSuitColor(card1.meta.suit) == getSuitColor(card2.meta.suit);
 }
 
-function isSameSuit(card1: PlayingCardDescriptor, card2: PlayingCardDescriptor) {
-  console.log(`checking suit: ${card1.suit} == ${card2.suit}`);
-  return card1.suit === card2.suit;
+function isSameSuit(card1: PlayingCard, card2: PlayingCard) {
+  console.log(`checking suit: ${card1.meta.suit} == ${card2.meta.suit}`);
+  return card1.meta.suit === card2.meta.suit;
 }
 
-function isNextInRank(card1: PlayingCardDescriptor, card2: PlayingCardDescriptor) {
-  console.log(`checking next in rank: ${card1.rank} -> ${card2.rank}`);
-  return card1.rank === card2.rank - 1;
+function isNextInRank(card1: PlayingCard, card2: PlayingCard) {
+  console.log(`checking next in rank: ${card1.meta.rank} -> ${card2.meta.rank}`);
+  return card1.meta.rank === card2.meta.rank - 1;
 }
 
-function isAceRank(card: PlayingCardDescriptor) {
-  return card.rank === 0;
+function isAceRank(card: PlayingCard) {
+  return card.meta.rank === 0;
 }
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
@@ -144,7 +142,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     return stack.cards.length - 1 === cardIdx;
   }
 
-  private getCard(stackId: string, cardIdx: number): PlayingCardDescriptor | null {
+  private getCard(stackId: string, cardIdx: number): PlayingCard | null {
     const stack = this.getStack(stackId);
     if (!stack) {
       console.error('Invalid card stack: 1');
@@ -309,7 +307,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     id: SolitaireCardStack,
     moveBehavior: PlayingCardStackBehavior,
     dropBehavior: PlayingCardStackDropBehavior,
-    cards: PlayingCardDescriptor[] = [],
+    cards: PlayingCardList = [],
   ) {
     this.cardStacks[id] = {
       meta: {

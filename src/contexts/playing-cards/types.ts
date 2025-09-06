@@ -18,14 +18,12 @@ export type Suit = (typeof OSuit)[keyof typeof OSuit];
 // function foo(param: Suit) { ... }
 // const someVar = {..., enumValue: OSuit, ... }
 
-export interface PlayingCardDescriptor {
+export interface PlayingCardMeta {
   suit: Suit;
   //    A                                            J    Q    K
   rank: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
   cardImg: string;
 }
-
-export type PlayingCardDescriptorList = PlayingCardDescriptor[];
 
 export interface PlayingCanvasPosition {
   x: number;
@@ -57,54 +55,22 @@ export type PlayingCardStackDropBehavior = (typeof OPlayingCardStackDropBehavior
 // function foo(param: StackBehavior) { ... }
 // const someVar = {..., enumValue: OStackBehavior, ... }
 
-export const OSolitaireFoundationStack = {
-  Foundation1: 'foundation1',
-  Foundation2: 'foundation2',
-  Foundation3: 'foundation3',
-  Foundation4: 'foundation4',
-};
-export type SolitaireFoundationStack = (typeof OSolitaireFoundationStack)[keyof typeof OSolitaireFoundationStack];
+export interface PlayingCard {
+  meta: PlayingCardMeta;
+  showingFace: boolean;
+}
 
-export const OSolitaireTableauStack = {
-  Tableau1: 'tableau1',
-  Tableau2: 'tableau2',
-  Tableau3: 'tableau3',
-  Tableau4: 'tableau4',
-  Tableau5: 'tableau5',
-  Tableau6: 'tableau6',
-  Tableau7: 'tableau7',
-};
-export type SolitaireTableauStack = (typeof OSolitaireTableauStack)[keyof typeof OSolitaireTableauStack];
-
-export const OSolitaireCardStack = {
-  Stock: 'stock',
-  Talon: 'talon',
-  Foundation1: OSolitaireFoundationStack.Foundation1,
-  Foundation2: OSolitaireFoundationStack.Foundation2,
-  Foundation3: OSolitaireFoundationStack.Foundation3,
-  Foundation4: OSolitaireFoundationStack.Foundation4,
-  Tableau1: OSolitaireTableauStack.Tableau1,
-  Tableau2: OSolitaireTableauStack.Tableau2,
-  Tableau3: OSolitaireTableauStack.Tableau3,
-  Tableau4: OSolitaireTableauStack.Tableau4,
-  Tableau5: OSolitaireTableauStack.Tableau5,
-  Tableau6: OSolitaireTableauStack.Tableau6,
-  Tableau7: OSolitaireTableauStack.Tableau7,
-};
-export type SolitaireCardStack = (typeof OSolitaireCardStack)[keyof typeof OSolitaireCardStack];
-// Usage:
-// function foo(param: SolitaireCardStack) { ... }
-// const someVar = {..., enumValue: OSolitaireCardStack, ... }
+export type PlayingCardList = PlayingCard[];
 
 export interface PlayingCardStackMeta {
-  id: SolitaireCardStack;
+  id: string;
   moveBehavior: PlayingCardStackBehavior;
   dropBehavior: PlayingCardStackDropBehavior;
 }
 
 export interface PlayingCardStackData {
   meta: PlayingCardStackMeta;
-  cards: PlayingCardDescriptorList;
+  cards: PlayingCardList;
 }
 
 export interface PlayingCardStackView {

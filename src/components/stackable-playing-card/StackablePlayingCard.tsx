@@ -1,29 +1,33 @@
+import CardBack from '@/assets/1B.svg';
 import { PlayingCardsHooks } from '@/contexts/playing-cards/playing-cards-context';
-import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/data/constants';
-import { OPlayingCardStackMoveBehavior } from '@/data/types';
+import { OPlayingCardStackMoveBehavior } from '@/contexts/playing-cards/types';
+import { CARD_DIMS_CLASS, LAYOUT_CONSTANTS } from '@/contexts/solitaire/constants';
 import { cn } from '@/lib/utils';
 import { useMemo } from 'react';
 import { StackableDraggedPlayingCards } from './StackableDraggedPlayingCards';
 import { StackablePlayingCardHolder } from './StackablePlayingCardHolder';
-import type { PlayingCardProps } from './types';
+import type { StackablePlayingCardProps } from './types';
 
-export function StackablePlayingCard({ data, view, index, dataIndex, hidden }: PlayingCardProps) {
+export function StackablePlayingCard({ data, view, index, dataIndex, hidden }: StackablePlayingCardProps) {
   const { draggableRef, isBeingDragged, currentPosition } = PlayingCardsHooks.useDraggable(
     { stackId: data.meta.id, cardIndex: dataIndex },
     view.position,
   );
-  // console.log(`card.dataIndex[${data.meta.id}]: ${dataIndex}`);
+
+  const card = data.cards[index];
+  const showingFace = card.showingFace;
 
   // TODO: These could be moved into the hook?
   const isDraggable =
+    showingFace &&
     data.meta.moveBehavior !== OPlayingCardStackMoveBehavior.Immovable &&
     (data.meta.moveBehavior !== OPlayingCardStackMoveBehavior.MoveOnlyTop || index === data.cards.length - 1);
   const nextSiblingStaticView = useMemo(
     () => ({
       ...view,
       position: {
-        x: view.position.x + view.stackedCardOffsetX,
-        y: view.position.y + view.stackedCardOffsetY,
+        x: view.position.x + view.stackedCardOffsetX * (showingFace ? 1 : 0.5),
+        y: view.position.y + view.stackedCardOffsetY * (showingFace ? 1 : 0.5),
       },
     }),
     [view.position],
@@ -48,7 +52,7 @@ export function StackablePlayingCard({ data, view, index, dataIndex, hidden }: P
           opacity: hidden ? 0 : 1,
         }}
       >
-        <img src={data.cards[index].cardImg} className={cn('', CARD_DIMS_CLASS)} draggable={false} />
+        <img src={card.showingFace ? card.meta.cardImg : CardBack} className={cn('', CARD_DIMS_CLASS)} draggable={false} />
       </div>
       {/* Hide the in-place siblings when dragging and show a static stack instead for performance reasons */}
       <StackablePlayingCardHolder

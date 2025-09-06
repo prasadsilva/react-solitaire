@@ -1,6 +1,6 @@
-import type { PlayingCardStackData, PlayingCardStackView } from '@/data/types';
+import type { PlayingCardStackData, PlayingCardStackView } from '@/contexts/playing-cards/types';
 
-export type PlayingCardProps = {
+export type StackablePlayingCardProps = {
   data: PlayingCardStackData;
   view: PlayingCardStackView;
   index: number;
@@ -8,7 +8,7 @@ export type PlayingCardProps = {
   hidden?: boolean;
 };
 
-export type PlayingCardsStackProps = {
+export type StackablePlayingCardsStackProps = {
   data: PlayingCardStackData;
   view: PlayingCardStackView;
   firstCardDataIndex: number;
