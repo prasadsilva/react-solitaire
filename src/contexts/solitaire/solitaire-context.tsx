@@ -44,6 +44,7 @@ function useStock() {
 
   useEffect(() => {
     context.addChangeListener(handleContextChange);
+    setStock([...context.getStock().cards]);
     return () => context.removeChangeListener(handleContextChange);
   }, [context]);
 
@@ -88,6 +89,7 @@ function useTalon() {
 
   useEffect(() => {
     context.addChangeListener(handleContextChange);
+    setTalonCards([...context.getTalon().cards]);
     return () => context.removeChangeListener(handleContextChange);
   }, [context]);
 
@@ -122,6 +124,7 @@ function useTableau(id: SolitaireTableauStack) {
 
   useEffect(() => {
     context.addChangeListener(handleContextChange);
+    setTableauCards([...context.getStack(id).cards]);
     return () => context.removeChangeListener(handleContextChange);
   }, [context]);
 
@@ -156,6 +159,7 @@ function useFoundation(id: SolitaireFoundationStack) {
 
   useEffect(() => {
     context.addChangeListener(handleContextChange);
+    setFoundationCards([...context.getStack(id).cards]);
     return () => context.removeChangeListener(handleContextChange);
   }, [context]);
 

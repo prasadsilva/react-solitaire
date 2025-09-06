@@ -41,17 +41,14 @@ function getSuitColor(suit: Suit): SuitColor {
 }
 
 function isSameColor(card1: PlayingCard, card2: PlayingCard) {
-  console.log(`checking color: ${getSuitColor(card1.meta.suit)} == ${getSuitColor(card2.meta.suit)}`);
   return getSuitColor(card1.meta.suit) == getSuitColor(card2.meta.suit);
 }
 
 function isSameSuit(card1: PlayingCard, card2: PlayingCard) {
-  console.log(`checking suit: ${card1.meta.suit} == ${card2.meta.suit}`);
   return card1.meta.suit === card2.meta.suit;
 }
 
 function isNextInRank(card1: PlayingCard, card2: PlayingCard) {
-  console.log(`checking next in rank: ${card1.meta.rank} -> ${card2.meta.rank}`);
   return card1.meta.rank === card2.meta.rank - 1;
 }
 
@@ -183,14 +180,12 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
         const slotHasCards = this.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
-          console.log(card);
           // No parent card; empty slot. Drop is only successful if it is an ace.
           if (card && isAceRank(card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
           }
         } else if (card) {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
-          console.log(slotParentCard);
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
           if (isSameSuit(card, slotParentCard) && isNextInRank(slotParentCard, card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
@@ -233,7 +228,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     }
     this.notifyContextStateChange(result);
   }
-  public onInvalidDrop(card: PlayingCardStackInfo) {
+  public onInvalidDrop(_card: PlayingCardStackInfo) {
     this.notifyContextStateChange(false);
   }
 

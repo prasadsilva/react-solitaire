@@ -75,68 +75,6 @@ class PlayingCardsContextData {
   public removeChangeListener(callback: PlayingCardsContextListener) {
     this.contextListeners.delete(callback);
   }
-
-  // private moveBetweenStacks(sourceStackInfo: PlayingCardStackInfo, targetStackInfo: PlayingCardStackInfo) {
-  //   const sourceStackIdx = sourceStackInfo.stackIndex;
-  //   if (sourceStackIdx === -1) {
-  //     console.warn('Unable to move card. Source stack is invalid');
-  //     return;
-  //   }
-  //   const targetStackIdx = targetStackInfo.stackIndex;
-  //   if (targetStackIdx === -1) {
-  //     console.warn('Unable to move card. Target stack is invalid');
-  //     return;
-  //   }
-
-  //   // Note: We need to perform a deep replication of the data for downstream components to detect the exact change
-  //   //       It would be better to use an immutable data library here
-  //   const cardStacksCopy = [...this.cardStacks];
-
-  //   switch (this.cardStacks[sourceStackInfo.stackIndex].behavior) {
-  //     case OPlayingCardStackMoveBehavior.MoveAllNextSiblings: {
-  //       // Remove card and next siblings below from source stack
-  //       const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] };
-  //       const sourceStackCardsCopy = sourceStackCopy.cards.slice(0, sourceStackInfo.cardIndex);
-  //       const cardsToMove = sourceStackCopy.cards.slice(sourceStackInfo.cardIndex);
-  //       if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
-  //         console.warn('Something went wrong with card removal');
-  //       }
-  //       sourceStackCopy.cards = sourceStackCardsCopy;
-  //       cardStacksCopy[sourceStackIdx] = sourceStackCopy;
-
-  //       // Add card and next siblings to target stack
-  //       const targetStackCopy = { ...this.cardStacks[targetStackIdx] };
-  //       const targetStackCardsCopy = [...targetStackCopy.cards];
-  //       targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove);
-  //       targetStackCopy.cards = targetStackCardsCopy;
-  //       cardStacksCopy[targetStackIdx] = targetStackCopy;
-
-  //       break;
-  //     }
-  //     case OPlayingCardStackMoveBehavior.MoveIndividually: {
-  //       // Remove only the one card from source stack
-  //       const sourceStackCopy = { ...this.cardStacks[sourceStackIdx] };
-  //       const sourceStackCardsCopy = [...sourceStackCopy.cards];
-  //       const cardsToMove = sourceStackCardsCopy.splice(sourceStackInfo.cardIndex, 1);
-  //       if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
-  //         console.warn('Something went wrong with card removal');
-  //       }
-  //       sourceStackCopy.cards = sourceStackCardsCopy;
-  //       cardStacksCopy[sourceStackIdx] = sourceStackCopy;
-
-  //       // Add the one card to the target stack
-  //       const targetStackCopy = { ...this.cardStacks[targetStackIdx] };
-  //       const targetStackCardsCopy = [...targetStackCopy.cards];
-  //       targetStackCardsCopy.splice(targetStackInfo.cardIndex, 0, ...cardsToMove);
-  //       targetStackCopy.cards = targetStackCardsCopy;
-  //       cardStacksCopy[targetStackIdx] = targetStackCopy;
-
-  //       break;
-  //     }
-  //   }
-
-  //   this.cardStacks = cardStacksCopy;
-  // }
 }
 
 export const createNewPlayingCardsContextValue = () => new PlayingCardsContextData();
@@ -273,7 +211,6 @@ function useDraggable(stackInfo: Immutable<PlayingCardStackInfo>, position: Play
             node.releasePointerCapture(e.pointerId);
           }
           setIsBeingDragged(true);
-          console.log(`active drag: ${stackInfo.stackId}:${stackInfo.cardIndex}`);
           setActiveDrag(stackInfo, e.clientX, e.clientY, handleDrag, handleEndDrag);
           e.preventDefault();
           e.stopPropagation();
@@ -306,15 +243,17 @@ function useCanvas() {
     throw new Error('useCanvas must be used within a PlayingCardsContext');
   }
   const [isCanvasAvailable, setIsCanvasAvailable] = useState(false);
-  const canvasRef = useCallback((node: HTMLDivElement | null) => {
-    if (playingCardsContext.getCanvasElement() && node) {
-      console.warn('Unable to register canvas element. A canvas is already registered.');
-      return;
-    }
-    playingCardsContext.setCanvasElement(node);
-    console.log('registered canvas');
-    setIsCanvasAvailable(node !== null);
-  }, []);
+  const canvasRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (playingCardsContext.getCanvasElement() && node) {
+        console.warn('Unable to register canvas element. A canvas is already registered.');
+        return;
+      }
+      playingCardsContext.setCanvasElement(node);
+      setIsCanvasAvailable(node !== null);
+    },
+    [playingCardsContext],
+  );
 
   return {
     canvasRef,
