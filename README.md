@@ -7,6 +7,7 @@ An exploration in creating a Solitaire game using React.
 ## Features
 
 - Add game over messaging
+- Add foundation to foundation moving
 - Save game state in local storage
 - Track player score
 - Persist high score in local storage
