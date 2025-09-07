@@ -15,15 +15,22 @@ import {
 import { notNull, objectHasValue } from '@/utils';
 import type { PlayingCardsContextListener } from '../../playing-cards/context/playing-cards-context';
 import { generateNewSolitaireGameData } from './deck-builder';
-import { OSolitaireCardStack, OSolitaireFoundationStack, OSolitaireTableauStack, type SolitaireCardStack } from './types';
+import {
+  OSolitaireCardStack,
+  OSolitaireFoundationStack,
+  OSolitaireTableauStack,
+  type SolitaireCardStack,
+  type SolitaireFoundationStack,
+  type SolitaireTableauStack,
+} from './types';
 
-function isTalonStack(value: string): boolean {
-  return value == OSolitaireCardStack.Talon;
+function isTalonStack(value: string): value is typeof OSolitaireCardStack.Talon {
+  return value === OSolitaireCardStack.Talon;
 }
-function isFoundationStack(value: string): boolean {
+function isFoundationStack(value: string): value is SolitaireFoundationStack {
   return objectHasValue(OSolitaireFoundationStack, value);
 }
-function isTableauStack(value: string): boolean {
+function isTableauStack(value: string): value is SolitaireTableauStack {
   return objectHasValue(OSolitaireTableauStack, value);
 }
 
@@ -59,7 +66,7 @@ function isAceRank(card: PlayingCard) {
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
 
 export class SolitaireContextData implements PlayingCardsContextListener {
-  private cardStacks: { [key: string]: PlayingCardStackData } = {};
+  private cardStacks: { [K in SolitaireCardStack]?: PlayingCardStackData } = {};
   private changeListeners: Set<SolitaireContextChangeListener>;
 
   public constructor() {
@@ -137,32 +144,46 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     );
   }
 
-  private hasCards(stackId: string): boolean {
+  private hasCards(stackId: SolitaireCardStack): boolean {
     const stack = this.getStack(stackId);
     if (!stack) {
-      console.error('Invalid card stack: 1');
+      console.error('Invalid card stack: -1');
       return false;
     }
     return stack.cards.length > 0;
   }
 
-  private isTopCard(stackId: string, cardIdx: number): boolean {
+  private hasHiddenCards(stackId: SolitaireCardStack): boolean {
     const stack = this.getStack(stackId);
     if (!stack) {
-      console.error('Invalid card stack: 1');
+      console.error('Invalid card stack: -2');
+      return false;
+    }
+    for (let idx = 0; idx < stack.cards.length; idx++) {
+      if (!stack.cards[idx].showingFace) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private isTopCard(stackId: SolitaireCardStack, cardIdx: number): boolean {
+    const stack = this.getStack(stackId);
+    if (!stack) {
+      console.error('Invalid card stack: -3');
       return false;
     }
     return stack.cards.length - 1 === cardIdx;
   }
 
-  private getCard(stackId: string, cardIdx: number): PlayingCard | null {
+  private getCard(stackId: SolitaireCardStack, cardIdx: number): PlayingCard | null {
     const stack = this.getStack(stackId);
     if (!stack) {
-      console.error('Invalid card stack: 1');
+      console.error('Invalid card stack: -4');
       return null;
     }
     if (cardIdx < 0 || cardIdx >= stack.cards.length) {
-      console.error('Invalid card index: 1');
+      console.error('Invalid card index: -5');
       return null;
     }
     const card = stack.cards[cardIdx];
@@ -266,16 +287,17 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   }
 
   private moveBetweenStacks(card: PlayingCardStackInfo, slot: PlayingCardStackInfo, showCardParent: boolean): boolean {
-    const sourceStackId = card.stackId;
+    const sourceStackId = card.stackId as SolitaireCardStack;
     const sourceStackCardIndex = card.cardIndex;
-    const sourceStack = this.cardStacks[card.stackId];
-    const targetStackId = slot.stackId;
+    const sourceStack = notNull(this.cardStacks[sourceStackId]);
+    const targetStackId = slot.stackId as SolitaireCardStack;
     const targetStackCardIndex = slot.cardIndex;
+    const targetStack = notNull(this.cardStacks[targetStackId]);
 
     switch (sourceStack.meta.moveBehavior) {
       case OPlayingCardStackMoveBehavior.MoveAllNextSiblings: {
         // Remove card and next siblings below from source stack
-        const sourceStackCopy = { ...this.cardStacks[sourceStackId] };
+        const sourceStackCopy = { ...sourceStack };
         const sourceStackCardsCopy = sourceStackCopy.cards.slice(0, sourceStackCardIndex);
         const cardsToMove = sourceStackCopy.cards.slice(sourceStackCardIndex);
         if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
@@ -291,7 +313,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         this.cardStacks[sourceStackId] = sourceStackCopy;
 
         // Add card and next siblings to target stack
-        const targetStackCopy = { ...this.cardStacks[targetStackId] };
+        const targetStackCopy = { ...targetStack };
         const targetStackCardsCopy = [...targetStackCopy.cards];
         targetStackCardsCopy.splice(targetStackCardIndex, 0, ...cardsToMove);
         targetStackCopy.cards = targetStackCardsCopy;
@@ -306,7 +328,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         }
 
         // Remove only the one card from source stack
-        const sourceStackCopy = { ...this.cardStacks[sourceStackId] };
+        const sourceStackCopy = { ...sourceStack };
         const sourceStackCardsCopy = [...sourceStackCopy.cards];
         const cardsToMove = sourceStackCardsCopy.splice(sourceStackCardIndex, 1);
         if (sourceStackCardsCopy.length === sourceStackCopy.cards.length) {
@@ -322,7 +344,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         this.cardStacks[sourceStackId] = sourceStackCopy;
 
         // Add the one card to the target stack
-        const targetStackCopy = { ...this.cardStacks[targetStackId] };
+        const targetStackCopy = { ...targetStack };
         const targetStackCardsCopy = [...targetStackCopy.cards];
         targetStackCardsCopy.splice(targetStackCardIndex, 0, ...cardsToMove);
         targetStackCopy.cards = targetStackCardsCopy;
@@ -357,16 +379,16 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     };
   }
 
-  public getStock() {
-    return this.cardStacks[OSolitaireCardStack.Stock];
+  public getStock(): PlayingCardStackData {
+    return notNull(this.cardStacks[OSolitaireCardStack.Stock]);
   }
 
-  public getTalon() {
-    return this.cardStacks[OSolitaireCardStack.Talon];
+  public getTalon(): PlayingCardStackData {
+    return notNull(this.cardStacks[OSolitaireCardStack.Talon]);
   }
 
-  public getStack(stackId: SolitaireCardStack) {
-    return this.cardStacks[stackId];
+  public getStack(stackId: SolitaireCardStack): PlayingCardStackData {
+    return notNull(this.cardStacks[stackId]);
   }
 
   drawCards() {
