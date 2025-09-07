@@ -1,67 +1,18 @@
 import {
   OPlayingCardStackDropBehavior,
   OPlayingCardStackMoveBehavior,
-  OSuit,
-  OSuitColor,
   type PlayingCard,
   type PlayingCardList,
   type PlayingCardStackBehavior,
   type PlayingCardStackData,
   type PlayingCardStackDropBehavior,
   type PlayingCardStackInfo,
-  type Suit,
-  type SuitColor,
 } from '@/playing-cards/context/types';
-import { notNull, objectHasValue } from '@/utils';
+import { notNull } from '@/utils';
 import type { PlayingCardsContextListener } from '../../playing-cards/context/playing-cards-context';
 import { generateNewSolitaireGameData } from './deck-builder';
-import {
-  OSolitaireCardStack,
-  OSolitaireFoundationStack,
-  OSolitaireTableauStack,
-  type SolitaireCardStack,
-  type SolitaireFoundationStack,
-  type SolitaireTableauStack,
-} from './types';
-
-function isTalonStack(value: string): value is typeof OSolitaireCardStack.Talon {
-  return value === OSolitaireCardStack.Talon;
-}
-function isFoundationStack(value: string): value is SolitaireFoundationStack {
-  return objectHasValue(OSolitaireFoundationStack, value);
-}
-function isTableauStack(value: string): value is SolitaireTableauStack {
-  return objectHasValue(OSolitaireTableauStack, value);
-}
-
-function getSuitColor(suit: Suit): SuitColor {
-  switch (suit) {
-    case OSuit.Clubs:
-      return OSuitColor.Black;
-    case OSuit.Spades:
-      return OSuitColor.Black;
-    case OSuit.Hearts:
-      return OSuitColor.Red;
-    case OSuit.Diamonds:
-      return OSuitColor.Red;
-  }
-}
-
-function isSameColor(card1: PlayingCard, card2: PlayingCard) {
-  return getSuitColor(card1.meta.suit) == getSuitColor(card2.meta.suit);
-}
-
-function isSameSuit(card1: PlayingCard, card2: PlayingCard) {
-  return card1.meta.suit === card2.meta.suit;
-}
-
-function isNextInRank(card1: PlayingCard, card2: PlayingCard) {
-  return card1.meta.rank === card2.meta.rank - 1;
-}
-
-function isAceRank(card: PlayingCard) {
-  return card.meta.rank === 0;
-}
+import { OSolitaireCardStack, OSolitaireTableauStack, type SolitaireCardStack } from './types';
+import Utils from './utils';
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
 
@@ -196,9 +147,9 @@ export class SolitaireContextData implements PlayingCardsContextListener {
 
   public onValidDrop(cardStackInfo: PlayingCardStackInfo, slotStackInfo: PlayingCardStackInfo) {
     let result = false;
-    if (isTableauStack(cardStackInfo.stackId)) {
+    if (Utils.isTableauStack(cardStackInfo.stackId)) {
       // Move originated from tableau
-      if (isTableauStack(slotStackInfo.stackId)) {
+      if (Utils.isTableauStack(slotStackInfo.stackId)) {
         // Target is another tableau
         const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
         const slotHasCards = this.hasCards(slotStackInfo.stackId);
@@ -208,30 +159,30 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         } else if (card) {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
-          if (!isSameColor(card, slotParentCard) && isNextInRank(card, slotParentCard)) {
+          if (!Utils.isSameColor(card, slotParentCard) && Utils.isNextInRank(card, slotParentCard)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
           }
         }
-      } else if (isFoundationStack(slotStackInfo.stackId) && this.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
+      } else if (Utils.isFoundationStack(slotStackInfo.stackId) && this.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
         // Target is foundation
         const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
         const slotHasCards = this.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is only successful if it is an ace.
-          if (card && isAceRank(card)) {
+          if (card && Utils.isAceRank(card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
           }
         } else if (card) {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
-          if (isSameSuit(card, slotParentCard) && isNextInRank(slotParentCard, card)) {
+          if (Utils.isSameSuit(card, slotParentCard) && Utils.isNextInRank(slotParentCard, card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
           }
         }
       }
-    } else if (isTalonStack(cardStackInfo.stackId)) {
+    } else if (Utils.isTalonStack(cardStackInfo.stackId)) {
       // Move originated from talon
-      if (isTableauStack(slotStackInfo.stackId)) {
+      if (Utils.isTableauStack(slotStackInfo.stackId)) {
         // Target is tableau
         const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
         const slotHasCards = this.hasCards(slotStackInfo.stackId);
@@ -241,30 +192,30 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         } else if (card) {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
-          if (!isSameColor(card, slotParentCard) && isNextInRank(card, slotParentCard)) {
+          if (!Utils.isSameColor(card, slotParentCard) && Utils.isNextInRank(card, slotParentCard)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         }
-      } else if (isFoundationStack(slotStackInfo.stackId) && this.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
+      } else if (Utils.isFoundationStack(slotStackInfo.stackId) && this.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
         // Target is foundation
         const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
         const slotHasCards = this.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is only successful if it is an ace.
-          if (card && isAceRank(card)) {
+          if (card && Utils.isAceRank(card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         } else if (card) {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
-          if (isSameSuit(card, slotParentCard) && isNextInRank(slotParentCard, card)) {
+          if (Utils.isSameSuit(card, slotParentCard) && Utils.isNextInRank(slotParentCard, card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         }
       }
-    } else if (isFoundationStack(cardStackInfo.stackId)) {
+    } else if (Utils.isFoundationStack(cardStackInfo.stackId)) {
       // Move originated from foundation
-      if (isTableauStack(slotStackInfo.stackId)) {
+      if (Utils.isTableauStack(slotStackInfo.stackId)) {
         // Target is tableau
         const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
         const slotHasCards = this.hasCards(slotStackInfo.stackId);
@@ -274,7 +225,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         } else if (card) {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
-          if (!isSameColor(card, slotParentCard) && isNextInRank(card, slotParentCard)) {
+          if (!Utils.isSameColor(card, slotParentCard) && Utils.isNextInRank(card, slotParentCard)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         }
