@@ -3,6 +3,7 @@ import { createNewPlayingCardsContextValue, PlayingCardsContext } from '@/playin
 import { SolitaireCanvas } from '@/solitaire/components/SolitaireCanvas';
 import { createNewSolitaireContextValue, SolitaireContext } from '@/solitaire/context/solitaire-context';
 import { useCallback, useState } from 'react';
+import GameOverPopup from './GameOverPopup';
 import SolitaireGameTitleBar from './SolitaireGameTitleBar';
 
 function SolitaireGame() {
@@ -16,6 +17,7 @@ function SolitaireGame() {
       <PlayingCardsContext value={createNewPlayingCardsContextValue()}>
         <SolitaireContext value={solitaireGame}>
           <div id="viewport" className="absolute w-screen h-screen min-w-[820px] bg-background flex flex-col">
+            <GameOverPopup />
             <SolitaireGameTitleBar startNewGame={startNewGame} />
             <div id="canvas-container" className="flex-2 flex flex-row justify-center">
               <div id="canvas-area" className="w-[820px]">
