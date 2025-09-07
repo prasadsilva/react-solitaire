@@ -13,8 +13,8 @@ export type FoundationPileProps = Immutable<{
   ComponentProps<'div'>;
 
 export function FoundationPile({ foundationId, position, ...props }: FoundationPileProps) {
-  const { foundationMeta, topCard, foundationCount } = SolitaireHooks.useFoundation(foundationId);
-  const firstShowDataIndex = useMemo(() => Math.max(foundationCount - 1, 0), [foundationCount]);
+  const { foundationMeta, topCard, nextCard, foundationCount } = SolitaireHooks.useFoundation(foundationId);
+  const firstShowDataIndex = useMemo(() => Math.max(foundationCount - 2, 0), [foundationCount]);
   const [viewData, setViewData] = useState<PlayingCardStackData>({
     meta: foundationMeta,
     cards: [],
@@ -30,6 +30,9 @@ export function FoundationPile({ foundationId, position, ...props }: FoundationP
 
   useEffect(() => {
     let cards = [];
+    if (nextCard) {
+      cards.push(nextCard);
+    }
     if (topCard) {
       cards.push(topCard);
     }
@@ -37,7 +40,7 @@ export function FoundationPile({ foundationId, position, ...props }: FoundationP
       meta: foundationMeta,
       cards,
     });
-  }, [topCard]);
+  }, [topCard, nextCard]);
 
   return <StackablePlayingCards {...props} data={viewData} view={view} firstCardDataIndex={firstShowDataIndex} />;
 }

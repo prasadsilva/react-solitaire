@@ -73,10 +73,26 @@ export class SolitaireContextData implements PlayingCardsContextListener {
       newSolitaireGameData.drawCards,
     );
     this.registerStack(OSolitaireCardStack.Talon, OPlayingCardStackMoveBehavior.MoveOnlyTop, OPlayingCardStackDropBehavior.NotAccepting);
-    this.registerStack(OSolitaireCardStack.Foundation1, OPlayingCardStackMoveBehavior.Immovable, OPlayingCardStackDropBehavior.AcceptsAny);
-    this.registerStack(OSolitaireCardStack.Foundation2, OPlayingCardStackMoveBehavior.Immovable, OPlayingCardStackDropBehavior.AcceptsAny);
-    this.registerStack(OSolitaireCardStack.Foundation3, OPlayingCardStackMoveBehavior.Immovable, OPlayingCardStackDropBehavior.AcceptsAny);
-    this.registerStack(OSolitaireCardStack.Foundation4, OPlayingCardStackMoveBehavior.Immovable, OPlayingCardStackDropBehavior.AcceptsAny);
+    this.registerStack(
+      OSolitaireCardStack.Foundation1,
+      OPlayingCardStackMoveBehavior.MoveOnlyTop,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Foundation2,
+      OPlayingCardStackMoveBehavior.MoveOnlyTop,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Foundation3,
+      OPlayingCardStackMoveBehavior.MoveOnlyTop,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.registerStack(
+      OSolitaireCardStack.Foundation4,
+      OPlayingCardStackMoveBehavior.MoveOnlyTop,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
     this.registerStack(
       OSolitaireCardStack.Tableau1,
       OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
@@ -221,6 +237,23 @@ export class SolitaireContextData implements PlayingCardsContextListener {
           const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
           if (isSameSuit(card, slotParentCard) && isNextInRank(slotParentCard, card)) {
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
+          }
+        }
+      }
+    } else if (isFoundationStack(cardStackInfo.stackId)) {
+      // Move originated from foundation
+      if (isTableauStack(slotStackInfo.stackId)) {
+        // Target is tableau
+        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        if (!slotHasCards) {
+          // No parent card; empty slot. Drop is always successful.
+          result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
+        } else if (card) {
+          const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
+          if (!isSameColor(card, slotParentCard) && isNextInRank(card, slotParentCard)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         }

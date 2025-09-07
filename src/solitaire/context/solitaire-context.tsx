@@ -143,6 +143,7 @@ function useFoundation(id: SolitaireFoundationStack) {
   const [foundationCards, setFoundationCards] = useState(context.getStack(id).cards);
   const foundationCount = useMemo(() => foundationCards.length, [foundationCards]);
   const topCard = useMemo(() => (foundationCards.length > 0 ? foundationCards[foundationCards.length - 1] : null), [foundationCards]);
+  const nextCard = useMemo(() => (foundationCards.length > 1 ? foundationCards[foundationCards.length - 2] : null), [foundationCards]);
 
   const handleContextChange = useCallback(
     (modelChanged: boolean) => {
@@ -167,6 +168,7 @@ function useFoundation(id: SolitaireFoundationStack) {
     foundationMeta,
     foundationCount,
     topCard,
+    nextCard,
   };
 }
 
