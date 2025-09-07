@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useEffect, useState } from 'react';
 import { SolitaireHooks } from '../context/solitaire-context';
 
-function GameOverPopup() {
+function SolitaireGameOverPopup() {
   const { gameOver } = SolitaireHooks.useGameState();
 
   const [showGameOverScreen, setShowGameOverScreen] = useState(false);
@@ -30,4 +30,4 @@ function GameOverPopup() {
   );
 }
 
-export default GameOverPopup;
+export default SolitaireGameOverPopup;

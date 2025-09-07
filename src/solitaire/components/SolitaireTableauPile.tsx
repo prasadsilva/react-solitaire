@@ -6,13 +6,13 @@ import type { SolitaireTableauStack } from '@/solitaire/context/types';
 import type { Immutable } from '@/utils';
 import { useMemo, type ComponentProps } from 'react';
 
-export type TableauPileProps = Immutable<{
+export type SolitaireTableauPileProps = Immutable<{
   tableauId: SolitaireTableauStack;
   position: PlayingCanvasPosition;
 }> &
   ComponentProps<'div'>;
 
-export function TableauPile({ tableauId, position, ...props }: TableauPileProps) {
+export function SolitaireTableauPile({ tableauId, position, ...props }: SolitaireTableauPileProps) {
   const { tableauMeta, tableauCards } = SolitaireHooks.useTableau(tableauId);
   const data = useMemo<PlayingCardStackData>(
     () => ({

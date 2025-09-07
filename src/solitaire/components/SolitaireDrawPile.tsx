@@ -10,12 +10,12 @@ const MAX_VISIBLE_CARDS = 3;
 const DRAW_PILE_CARDS_OFFSET_X = 3;
 const DRAW_PILE_CARDS_OFFSET_Y = 3;
 
-export type DrawPileCardProps = Immutable<{
+type DrawPileCardProps = Immutable<{
   index: number;
 }> &
   ComponentProps<'div'>;
 
-export function DrawPileCard({ index }: DrawPileCardProps) {
+function DrawPileCard({ index }: DrawPileCardProps) {
   const { doDrawCards } = SolitaireHooks.useStock();
 
   const handleCardClick = useCallback(
@@ -37,22 +37,22 @@ export function DrawPileCard({ index }: DrawPileCardProps) {
   );
 }
 
-export type DrawPileVisibleCardsViewProps = Immutable<{
+type DrawPileVisibleCardsViewProps = Immutable<{
   count: number;
 }>;
 
-export function DrawPileVisibleCardsView({ count }: DrawPileVisibleCardsViewProps) {
+function DrawPileVisibleCardsView({ count }: DrawPileVisibleCardsViewProps) {
   const cards = useMemo(() => Array(Math.min(MAX_VISIBLE_CARDS, count)).fill(0), [count]);
 
   return cards.map((_, index) => <DrawPileCard key={`draw_pile_card_${index}`} index={index} />);
 }
 
-export type DrawPilePileProps = Immutable<{
+export type SolitaireDrawPilePileProps = Immutable<{
   position: PlayingCanvasPosition;
 }> &
   ComponentProps<'div'>;
 
-export function DrawPile({ position, ...props }: DrawPilePileProps) {
+export function SolitaireDrawPile({ position, ...props }: SolitaireDrawPilePileProps) {
   const { drawPileCount, doResetDrawPile } = SolitaireHooks.useStock();
 
   return (

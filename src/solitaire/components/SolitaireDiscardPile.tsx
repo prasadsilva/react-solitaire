@@ -2,30 +2,28 @@ import { StackablePlayingCards } from '@/playing-cards/components/stackable-play
 import { type PlayingCanvasPosition, type PlayingCardStackData, type PlayingCardStackView } from '@/playing-cards/context/types';
 import { LAYOUT_CONSTANTS } from '@/solitaire/context/constants';
 import { SolitaireHooks } from '@/solitaire/context/solitaire-context';
-import type { SolitaireFoundationStack } from '@/solitaire/context/types';
 import type { Immutable } from '@/utils';
 import { useEffect, useMemo, useState, type ComponentProps } from 'react';
 
-export type FoundationPileProps = Immutable<{
-  foundationId: SolitaireFoundationStack;
+export type SolitaireDiscardPilePileProps = Immutable<{
   position: PlayingCanvasPosition;
 }> &
   ComponentProps<'div'>;
 
-export function FoundationPile({ foundationId, position, ...props }: FoundationPileProps) {
-  const { foundationMeta, topCard, nextCard, foundationCount } = SolitaireHooks.useFoundation(foundationId);
-  const firstShowDataIndex = useMemo(() => Math.max(foundationCount - 2, 0), [foundationCount]);
+export function SolitaireDiscardPile({ position, ...props }: SolitaireDiscardPilePileProps) {
+  const { talonMeta, topCard, nextCard, talonCount } = SolitaireHooks.useTalon();
+  const firstShowDataIndex = useMemo(() => Math.max(talonCount - 2, 0), [talonCount]);
   const [viewData, setViewData] = useState<PlayingCardStackData>({
-    meta: foundationMeta,
+    meta: talonMeta,
     cards: [],
   });
   const view = useMemo<PlayingCardStackView>(
     () => ({
       position,
-      stackedCardOffsetX: LAYOUT_CONSTANTS.FOUNDATION_PILE_CARD_XOFFSET,
-      stackedCardOffsetY: LAYOUT_CONSTANTS.FOUNDATION_PILE_CARD_YOFFSET,
+      stackedCardOffsetX: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_XOFFSET,
+      stackedCardOffsetY: LAYOUT_CONSTANTS.DISCARD_PILE_CARD_YOFFSET,
     }),
-    [position, foundationCount],
+    [position, talonCount],
   );
 
   useEffect(() => {
@@ -37,7 +35,7 @@ export function FoundationPile({ foundationId, position, ...props }: FoundationP
       cards.push(topCard);
     }
     setViewData({
-      meta: foundationMeta,
+      meta: talonMeta,
       cards,
     });
   }, [topCard, nextCard]);
