@@ -8,9 +8,9 @@ import { DialogDescription } from '@radix-ui/react-dialog';
 import { Info } from 'lucide-react';
 import { useCallback, useState, type ComponentProps } from 'react';
 
-function InfoToggle({ className }: ComponentProps<typeof Button>) {
+function InfoToggle(props: ComponentProps<typeof Button>) {
   return (
-    <Button variant="outline" size="icon_sm" className={className}>
+    <Button {...props} variant="outline" size="icon_sm">
       <Info />
     </Button>
   );
@@ -28,7 +28,7 @@ function SolitaireGame() {
         <div id="viewport" className="absolute w-screen h-screen min-w-[820px] bg-background flex flex-col">
           <div id="title-bar" className="w-full h-fit bg-neutral-200 dark:bg-neutral-700 shadow-sm shadow-gray-500 dark:shadow-gray-800">
             <div id="title-bar-content" className="max-w-[820px] flex flex-row gap-2 p-2 items-center">
-              <DialogTrigger>
+              <DialogTrigger asChild>
                 <InfoToggle className="w-9 h-9" />
               </DialogTrigger>
               <DialogContent>
