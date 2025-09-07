@@ -3,7 +3,7 @@ export const OSolitaireFoundationStack = {
   Foundation2: 'foundation2',
   Foundation3: 'foundation3',
   Foundation4: 'foundation4',
-};
+} as const;
 export type SolitaireFoundationStack = (typeof OSolitaireFoundationStack)[keyof typeof OSolitaireFoundationStack];
 // Usage:
 // function foo(param: SolitaireFoundationStack) { ... }
@@ -17,7 +17,7 @@ export const OSolitaireTableauStack = {
   Tableau5: 'tableau5',
   Tableau6: 'tableau6',
   Tableau7: 'tableau7',
-};
+} as const;
 export type SolitaireTableauStack = (typeof OSolitaireTableauStack)[keyof typeof OSolitaireTableauStack];
 // Usage:
 // function foo(param: SolitaireTableauStack) { ... }
@@ -37,7 +37,7 @@ export const OSolitaireCardStack = {
   Tableau5: OSolitaireTableauStack.Tableau5,
   Tableau6: OSolitaireTableauStack.Tableau6,
   Tableau7: OSolitaireTableauStack.Tableau7,
-};
+} as const;
 export type SolitaireCardStack = (typeof OSolitaireCardStack)[keyof typeof OSolitaireCardStack];
 // Usage:
 // function foo(param: SolitaireCardStack) { ... }

@@ -4,7 +4,7 @@ import { OSolitaireTableauStack, type SolitaireTableauStack } from './types';
 
 interface NewSolitaireGameData {
   drawCards: PlayingCardList;
-  tableauCards: { [key: SolitaireTableauStack]: PlayingCardList };
+  tableauCards: { [K in SolitaireTableauStack]: PlayingCardList };
 }
 
 export function generateNewSolitaireGameData(): NewSolitaireGameData {
@@ -27,7 +27,7 @@ export function generateNewSolitaireGameData(): NewSolitaireGameData {
     OSolitaireTableauStack.Tableau6,
     OSolitaireTableauStack.Tableau7,
   ];
-  const tableauCards: { [key: SolitaireTableauStack]: PlayingCardList } = {
+  const tableauCards: { [K in SolitaireTableauStack]: PlayingCardList } = {
     [OSolitaireTableauStack.Tableau1]: [],
     [OSolitaireTableauStack.Tableau2]: [],
     [OSolitaireTableauStack.Tableau3]: [],
