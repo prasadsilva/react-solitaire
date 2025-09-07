@@ -11,7 +11,13 @@ import {
 import { notNull } from '@/utils';
 import type { PlayingCardsContextListener } from '../../playing-cards/context/playing-cards-context';
 import { generateNewSolitaireGameData } from './deck-builder';
-import { OSolitaireCardStack, OSolitaireTableauStack, type SolitaireCardStack } from './types';
+import {
+  OSolitaireCardStack,
+  OSolitaireDebugState,
+  OSolitaireTableauStack,
+  type SolitaireCardStack,
+  type SolitaireDebugState,
+} from './types';
 import Utils from './utils';
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
@@ -19,6 +25,7 @@ type SolitaireContextChangeListener = (modelChanged: boolean) => void;
 export class SolitaireContextData implements PlayingCardsContextListener {
   private cardStacks: { [K in SolitaireCardStack]?: PlayingCardStackData } = {};
   private changeListeners: Set<SolitaireContextChangeListener>;
+  private debugStates: { [K in SolitaireDebugState]: boolean } = { [OSolitaireDebugState.GameOver]: false };
 
   public constructor() {
     this.changeListeners = new Set();
@@ -93,6 +100,22 @@ export class SolitaireContextData implements PlayingCardsContextListener {
       OPlayingCardStackDropBehavior.AcceptsAny,
       newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau7],
     );
+  }
+
+  public _debugSetGameOver() {
+    console.log('setting debug game over state');
+    this.debugStates[OSolitaireDebugState.GameOver] = true;
+    this.notifyContextStateChange(false);
+  }
+
+  public isGameOver(): boolean {
+    if (this.debugStates[OSolitaireDebugState.GameOver]) {
+      return true;
+    }
+    // If there are no more stock/talon cards and all tableau cards are showing face, then the game is effectively over.
+    const tableauStackKeys = Object.values(OSolitaireTableauStack);
+    const areAllTableauCardsShowingFace = tableauStackKeys.reduce((accum, key) => accum && !this.hasHiddenCards(key), true);
+    return this.getStock().cards.length === 0 && this.getTalon().cards.length === 0 && areAllTableauCardsShowingFace;
   }
 
   private hasCards(stackId: SolitaireCardStack): boolean {

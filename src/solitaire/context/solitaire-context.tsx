@@ -21,6 +21,36 @@ export function SolitaireContext({ children, value }: React.ProviderProps<Solita
   return <SolitaireContextImpl.Provider value={value}>{children}</SolitaireContextImpl.Provider>;
 }
 
+function useGameState() {
+  const context = useContext(SolitaireContextImpl);
+  if (!context) {
+    throw new Error('useGameState must be used within a SolitaireContext');
+  }
+  const [gameOver, setGameOver] = useState(context.isGameOver());
+
+  const handleContextChange = useCallback(
+    (_modelChanged: boolean) => {
+      setGameOver(context.isGameOver());
+    },
+    [context],
+  );
+
+  useEffect(() => {
+    context.addChangeListener(handleContextChange);
+    setGameOver(context.isGameOver());
+    return () => context.removeChangeListener(handleContextChange);
+  }, [context]);
+
+  const _debugSetGameOver = useCallback(() => {
+    context._debugSetGameOver();
+  }, [context]);
+
+  return {
+    gameOver,
+    _debugSetGameOver,
+  };
+}
+
 function useStock() {
   const context = useContext(SolitaireContextImpl);
   if (!context) {
@@ -173,6 +203,7 @@ function useFoundation(id: SolitaireFoundationStack) {
 }
 
 export const SolitaireHooks = {
+  useGameState,
   useStock,
   useTalon,
   useTableau,

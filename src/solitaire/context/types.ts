@@ -42,3 +42,8 @@ export type SolitaireCardStack = (typeof OSolitaireCardStack)[keyof typeof OSoli
 // Usage:
 // function foo(param: SolitaireCardStack) { ... }
 // const someVar = {..., enumValue: OSolitaireCardStack, ... }
+
+export const OSolitaireDebugState = {
+  GameOver: 'gameover',
+} as const;
+export type SolitaireDebugState = (typeof OSolitaireDebugState)[keyof typeof OSolitaireDebugState];
