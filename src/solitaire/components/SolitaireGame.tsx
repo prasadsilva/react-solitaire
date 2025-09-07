@@ -26,8 +26,11 @@ function SolitaireGame() {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <Dialog>
         <div id="viewport" className="absolute w-screen h-screen min-w-[820px] bg-background flex flex-col">
-          <div id="title-bar" className="w-full h-fit bg-neutral-200 dark:bg-neutral-700 shadow-sm shadow-gray-500 dark:shadow-gray-800">
-            <div id="title-bar-content" className="max-w-[820px] flex flex-row gap-2 p-2 items-center">
+          <div
+            id="title-bar"
+            className="w-full h-fit bg-neutral-200 dark:bg-neutral-700 shadow-sm shadow-gray-500 dark:shadow-gray-800 flex flex-row justify-center"
+          >
+            <div id="title-bar-content" className="w-[820px] flex flex-row gap-2 p-2 items-center">
               <DialogTrigger asChild>
                 <InfoToggle className="w-9 h-9" />
               </DialogTrigger>
@@ -51,12 +54,14 @@ function SolitaireGame() {
               <ThemeToggle className="w-9 h-9" />
             </div>
           </div>
-          <div id="canvas-area" className="flex-2">
-            <PlayingCardsContext value={createNewPlayingCardsContextValue()}>
-              <SolitaireContext value={solitaireGame}>
-                <SolitaireCanvas />
-              </SolitaireContext>
-            </PlayingCardsContext>
+          <div id="canvas-container" className="flex-2 flex flex-row justify-center">
+            <div id="canvas-area" className="w-[820px]">
+              <PlayingCardsContext value={createNewPlayingCardsContextValue()}>
+                <SolitaireContext value={solitaireGame}>
+                  <SolitaireCanvas />
+                </SolitaireContext>
+              </PlayingCardsContext>
+            </div>
           </div>
         </div>
       </Dialog>
