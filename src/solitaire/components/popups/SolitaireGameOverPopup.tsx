@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { SolitaireHooks } from '@/solitaire/context/solitaire-context';
 import { useEffect, useState } from 'react';
-import { SolitaireHooks } from '../context/solitaire-context';
 
 function SolitaireGameOverPopup() {
   const { gameOver } = SolitaireHooks.useGameState();

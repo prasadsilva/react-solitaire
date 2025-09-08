@@ -3,7 +3,7 @@ import { createNewPlayingCardsContextValue, PlayingCardsContext } from '@/playin
 import { SolitaireCanvas } from '@/solitaire/components/SolitaireCanvas';
 import { createNewSolitaireContextValue, SolitaireContext } from '@/solitaire/context/solitaire-context';
 import { useCallback, useState } from 'react';
-import SolitaireGameOverPopup from './SolitaireGameOverPopup';
+import SolitaireGameOverPopup from './popups/SolitaireGameOverPopup';
 import SolitaireGameTitleBar from './SolitaireGameTitleBar';
 
 function SolitaireGame() {
