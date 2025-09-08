@@ -252,6 +252,17 @@ export class SolitaireContextData implements PlayingCardsContextListener {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         }
+      } else if (Utils.isFoundationStack(slotStackInfo.stackId)) {
+        // Target is another foundation
+        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        if (!slotHasCards) {
+          // No parent card; empty slot. Drop is successful.
+          if (card && Utils.isAceRank(card)) {
+            result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
+          }
+        }
+        // If slot already has cards, drop is rejected always.
       }
     }
     this.notifyContextStateChange(result);
