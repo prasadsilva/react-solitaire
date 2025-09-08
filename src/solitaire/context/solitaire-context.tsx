@@ -51,6 +51,44 @@ function useGameState() {
   };
 }
 
+function useElapsedTime() {
+  const context = useContext(SolitaireContextImpl);
+  if (!context) {
+    throw new Error('useGameState must be used within a SolitaireContext');
+  }
+  const [elapsedSeconds, setElapsedSeconds] = useState(Math.floor(context.getElapsedTime() / 1000));
+  const [intervalId, setIntervalId] = useState(-1);
+  const { gameOver } = useGameState();
+
+  useEffect(() => {
+    setElapsedSeconds(Math.floor(context.getElapsedTime() / 1000));
+    const handle = setInterval(() => {
+      setElapsedSeconds(Math.floor(context.getElapsedTime() / 1000));
+    }, 1000);
+    setIntervalId(handle);
+
+    return () => {
+      if (handle != -1) {
+        clearInterval(handle);
+        if (intervalId === handle) {
+          setIntervalId(-1);
+        }
+      }
+    };
+  }, [context]);
+
+  useEffect(() => {
+    if (gameOver) {
+      clearInterval(intervalId);
+      setIntervalId(-1);
+    }
+  }, [gameOver]);
+
+  return {
+    elapsedSeconds,
+  };
+}
+
 function useStock() {
   const context = useContext(SolitaireContextImpl);
   if (!context) {
@@ -204,6 +242,7 @@ function useFoundation(id: SolitaireFoundationStack) {
 
 export const SolitaireHooks = {
   useGameState,
+  useElapsedTime,
   useStock,
   useTalon,
   useTableau,

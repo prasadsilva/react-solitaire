@@ -26,6 +26,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   private cardStacks: { [K in SolitaireCardStack]?: PlayingCardStackData } = {};
   private changeListeners: Set<SolitaireContextChangeListener>;
   private debugStates: { [K in SolitaireDebugState]: boolean } = { [OSolitaireDebugState.GameOver]: false };
+  private startTime: number = Date.now();
 
   public constructor() {
     this.changeListeners = new Set();
@@ -102,8 +103,11 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     );
   }
 
+  public getElapsedTime(): number {
+    return Date.now() - this.startTime;
+  }
+
   public _debugSetGameOver() {
-    console.log('setting debug game over state');
     this.debugStates[OSolitaireDebugState.GameOver] = true;
     this.notifyContextStateChange(false);
   }
@@ -118,54 +122,48 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     return this.getStock().cards.length === 0 && this.getTalon().cards.length === 0 && areAllTableauCardsShowingFace;
   }
 
-  private hasCards(stackId: SolitaireCardStack): boolean {
-    const stack = this.getStack(stackId);
-    if (!stack) {
-      console.error('Invalid card stack: -1');
-      return false;
-    }
-    return stack.cards.length > 0;
+  public getStock(): PlayingCardStackData {
+    return notNull(this.cardStacks[OSolitaireCardStack.Stock]);
   }
 
-  private hasHiddenCards(stackId: SolitaireCardStack): boolean {
-    const stack = this.getStack(stackId);
-    if (!stack) {
-      console.error('Invalid card stack: -2');
-      return false;
-    }
-    for (let idx = 0; idx < stack.cards.length; idx++) {
-      if (!stack.cards[idx].showingFace) {
-        return true;
-      }
-    }
-    return false;
+  public getTalon(): PlayingCardStackData {
+    return notNull(this.cardStacks[OSolitaireCardStack.Talon]);
   }
 
-  private isTopCard(stackId: SolitaireCardStack, cardIdx: number): boolean {
-    const stack = this.getStack(stackId);
-    if (!stack) {
-      console.error('Invalid card stack: -3');
-      return false;
-    }
-    return stack.cards.length - 1 === cardIdx;
+  public getStack(stackId: SolitaireCardStack): PlayingCardStackData {
+    return notNull(this.cardStacks[stackId]);
   }
 
-  private getCard(stackId: SolitaireCardStack, cardIdx: number): PlayingCard | null {
-    const stack = this.getStack(stackId);
-    if (!stack) {
-      console.error('Invalid card stack: -4');
-      return null;
+  public drawCards() {
+    const stock = this.getStock();
+    const talon = this.getTalon();
+    if (stock.cards.length > 0) {
+      const drawnCards = stock.cards.slice(0, 3).map((card) => ({ ...card, showingFace: true }));
+      stock.cards = stock.cards.slice(3);
+      talon.cards = [...talon.cards, ...drawnCards];
+      this.notifyContextStateChange(true);
+    } else {
+      this.notifyContextStateChange(false);
     }
-    if (cardIdx < 0 || cardIdx >= stack.cards.length) {
-      console.error('Invalid card index: -5');
-      return null;
+  }
+
+  public resetDrawPile() {
+    const stock = this.getStock();
+    const talon = this.getTalon();
+    if (stock.cards.length === 0 && talon.cards.length > 0) {
+      stock.cards = talon.cards.map((card) => ({ ...card, showingFace: false }));
+      talon.cards = [];
+      this.notifyContextStateChange(true);
+    } else {
+      this.notifyContextStateChange(false);
     }
-    const card = stack.cards[cardIdx];
-    if (!card) {
-      console.error(`Card not found at index ${cardIdx}`);
-      return null;
-    }
-    return card;
+  }
+
+  public addChangeListener(callback: SolitaireContextChangeListener) {
+    this.changeListeners.add(callback);
+  }
+  public removeChangeListener(callback: SolitaireContextChangeListener) {
+    this.changeListeners.delete(callback);
   }
 
   public onValidDrop(cardStackInfo: PlayingCardStackInfo, slotStackInfo: PlayingCardStackInfo) {
@@ -364,49 +362,56 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     };
   }
 
-  public getStock(): PlayingCardStackData {
-    return notNull(this.cardStacks[OSolitaireCardStack.Stock]);
-  }
-
-  public getTalon(): PlayingCardStackData {
-    return notNull(this.cardStacks[OSolitaireCardStack.Talon]);
-  }
-
-  public getStack(stackId: SolitaireCardStack): PlayingCardStackData {
-    return notNull(this.cardStacks[stackId]);
-  }
-
-  drawCards() {
-    const stock = this.getStock();
-    const talon = this.getTalon();
-    if (stock.cards.length > 0) {
-      const drawnCards = stock.cards.slice(0, 3).map((card) => ({ ...card, showingFace: true }));
-      stock.cards = stock.cards.slice(3);
-      talon.cards = [...talon.cards, ...drawnCards];
-      this.notifyContextStateChange(true);
-    } else {
-      this.notifyContextStateChange(false);
+  private hasCards(stackId: SolitaireCardStack): boolean {
+    const stack = this.getStack(stackId);
+    if (!stack) {
+      console.error('Invalid card stack: -1');
+      return false;
     }
+    return stack.cards.length > 0;
   }
 
-  resetDrawPile() {
-    const stock = this.getStock();
-    const talon = this.getTalon();
-    if (stock.cards.length === 0 && talon.cards.length > 0) {
-      stock.cards = talon.cards.map((card) => ({ ...card, showingFace: false }));
-      talon.cards = [];
-      this.notifyContextStateChange(true);
-    } else {
-      this.notifyContextStateChange(false);
+  private hasHiddenCards(stackId: SolitaireCardStack): boolean {
+    const stack = this.getStack(stackId);
+    if (!stack) {
+      console.error('Invalid card stack: -2');
+      return false;
     }
+    for (let idx = 0; idx < stack.cards.length; idx++) {
+      if (!stack.cards[idx].showingFace) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  public addChangeListener(callback: SolitaireContextChangeListener) {
-    this.changeListeners.add(callback);
+  private isTopCard(stackId: SolitaireCardStack, cardIdx: number): boolean {
+    const stack = this.getStack(stackId);
+    if (!stack) {
+      console.error('Invalid card stack: -3');
+      return false;
+    }
+    return stack.cards.length - 1 === cardIdx;
   }
-  public removeChangeListener(callback: SolitaireContextChangeListener) {
-    this.changeListeners.delete(callback);
+
+  private getCard(stackId: SolitaireCardStack, cardIdx: number): PlayingCard | null {
+    const stack = this.getStack(stackId);
+    if (!stack) {
+      console.error('Invalid card stack: -4');
+      return null;
+    }
+    if (cardIdx < 0 || cardIdx >= stack.cards.length) {
+      console.error('Invalid card index: -5');
+      return null;
+    }
+    const card = stack.cards[cardIdx];
+    if (!card) {
+      console.error(`Card not found at index ${cardIdx}`);
+      return null;
+    }
+    return card;
   }
+
   private notifyContextStateChange(modelChanged: boolean) {
     this.changeListeners.forEach((callback) => callback(modelChanged));
   }

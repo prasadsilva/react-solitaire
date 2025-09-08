@@ -5,12 +5,22 @@ import { useMemo } from 'react';
 import { SolitaireHooks } from '../context/solitaire-context';
 import SolitaireInfoPopup from './popups/SolitaireInfoPopup';
 
+// Format time as HH:MM:SS
+const formatTime = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+
 type SolitaireGameTitleBarProps = {
   startNewGame: () => void;
 };
 function SolitaireGameTitleBar({ startNewGame }: SolitaireGameTitleBarProps) {
   const debugModeEnabled = useMemo(() => import.meta.env.DEV, []);
   const { _debugSetGameOver } = SolitaireHooks.useGameState();
+  const { elapsedSeconds } = SolitaireHooks.useElapsedTime();
 
   return (
     <div
@@ -20,6 +30,7 @@ function SolitaireGameTitleBar({ startNewGame }: SolitaireGameTitleBarProps) {
       <div id="title-bar-content" className="w-[820px] flex flex-row gap-2 p-2 items-center">
         <SolitaireInfoPopup />
         <div className="flex-2">React Solitaire</div>
+        <div className="text-primary opacity-30">{formatTime(elapsedSeconds)}</div>
         {debugModeEnabled && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

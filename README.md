@@ -6,8 +6,10 @@ An exploration in creating a Solitaire game using React.
 
 ## Features
 
-- Track player score & time to complete
-- Persist high score in local storage
+- Persist best time in local storage
+  - Debug: save current time to top 10
+  - Debug: clear top 10
+  - Popup to show top 10 times
 - Save game state in local storage
 
 ## Tech debt
