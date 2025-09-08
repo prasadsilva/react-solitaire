@@ -27,6 +27,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   private changeListeners: Set<SolitaireContextChangeListener>;
   private debugStates: { [K in SolitaireDebugState]: boolean } = { [OSolitaireDebugState.GameOver]: false };
   private startTime: number = Date.now();
+  private actionCount: number = 0;
 
   public constructor() {
     this.changeListeners = new Set();
@@ -104,6 +105,10 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   }
 
   public getElapsedTime(): number {
+    if (this.actionCount === 0) {
+      this.startTime = Date.now();
+      return 0;
+    }
     return Date.now() - this.startTime;
   }
 
@@ -141,6 +146,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
       const drawnCards = stock.cards.slice(0, 3).map((card) => ({ ...card, showingFace: true }));
       stock.cards = stock.cards.slice(3);
       talon.cards = [...talon.cards, ...drawnCards];
+      this.actionCount++;
       this.notifyContextStateChange(true);
     } else {
       this.notifyContextStateChange(false);
@@ -262,6 +268,9 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         }
         // If slot already has cards, drop is rejected always.
       }
+    }
+    if (result) {
+      this.actionCount++;
     }
     this.notifyContextStateChange(result);
   }
