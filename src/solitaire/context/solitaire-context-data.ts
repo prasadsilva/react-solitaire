@@ -1,35 +1,27 @@
 import {
   OPlayingCardStackDropBehavior,
   OPlayingCardStackMoveBehavior,
-  type PlayingCard,
   type PlayingCardList,
   type PlayingCardStackBehavior,
-  type PlayingCardStackData,
   type PlayingCardStackDropBehavior,
   type PlayingCardStackInfo,
 } from '@/playing-cards/context/types';
 import { notNull } from '@/utils';
 import type { PlayingCardsContextListener } from '../../playing-cards/context/playing-cards-context';
 import { generateNewSolitaireGameData } from './deck-builder';
-import {
-  OSolitaireCardStack,
-  OSolitaireDebugState,
-  OSolitaireTableauStack,
-  type SolitaireCardStack,
-  type SolitaireDebugState,
-} from './types';
+import SolitaireGameState from './solitaire-game-state';
+import { OSolitaireCardStack, OSolitaireDebugState, type SolitaireCardStack, type SolitaireDebugState } from './types';
 import Utils from './utils';
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
 
 export class SolitaireContextData implements PlayingCardsContextListener {
-  private cardStacks: { [K in SolitaireCardStack]?: PlayingCardStackData } = {};
+  private gameState: SolitaireGameState;
   private changeListeners: Set<SolitaireContextChangeListener>;
   private debugStates: { [K in SolitaireDebugState]: boolean } = { [OSolitaireDebugState.GameOver]: false };
-  private startTime: number = Date.now();
-  private actionCount: number = 0;
 
   public constructor() {
+    this.gameState = new SolitaireGameState();
     this.changeListeners = new Set();
 
     const newSolitaireGameData = generateNewSolitaireGameData();
@@ -105,11 +97,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   }
 
   public getElapsedTime(): number {
-    if (this.actionCount === 0) {
-      this.startTime = Date.now();
-      return 0;
-    }
-    return Date.now() - this.startTime;
+    return this.gameState.elapsedTime;
   }
 
   public _debugSetGameOver() {
@@ -121,32 +109,29 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     if (this.debugStates[OSolitaireDebugState.GameOver]) {
       return true;
     }
-    // If there are no more stock/talon cards and all tableau cards are showing face, then the game is effectively over.
-    const tableauStackKeys = Object.values(OSolitaireTableauStack);
-    const areAllTableauCardsShowingFace = tableauStackKeys.reduce((accum, key) => accum && !this.hasHiddenCards(key), true);
-    return this.getStock().cards.length === 0 && this.getTalon().cards.length === 0 && areAllTableauCardsShowingFace;
+    return this.gameState.isGameOver();
   }
 
-  public getStock(): PlayingCardStackData {
-    return notNull(this.cardStacks[OSolitaireCardStack.Stock]);
+  public getStock() {
+    return this.gameState.getStock();
   }
-
-  public getTalon(): PlayingCardStackData {
-    return notNull(this.cardStacks[OSolitaireCardStack.Talon]);
+  public getTalon() {
+    return this.gameState.getTalon();
   }
-
-  public getStack(stackId: SolitaireCardStack): PlayingCardStackData {
-    return notNull(this.cardStacks[stackId]);
+  public getStack(id: SolitaireCardStack) {
+    return this.gameState.getStack(id);
   }
 
   public drawCards() {
-    const stock = this.getStock();
-    const talon = this.getTalon();
+    const stock = this.gameState.getStockCopy();
+    const talon = this.gameState.getTalonCopy();
     if (stock.cards.length > 0) {
       const drawnCards = stock.cards.slice(0, 3).map((card) => ({ ...card, showingFace: true }));
       stock.cards = stock.cards.slice(3);
       talon.cards = [...talon.cards, ...drawnCards];
-      this.actionCount++;
+      this.gameState.setStock(stock);
+      this.gameState.setTalon(talon);
+      this.gameState.incrementActionCount();
       this.notifyContextStateChange(true);
     } else {
       this.notifyContextStateChange(false);
@@ -154,11 +139,14 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   }
 
   public resetDrawPile() {
-    const stock = this.getStock();
-    const talon = this.getTalon();
+    const stock = this.gameState.getStockCopy();
+    const talon = this.gameState.getTalonCopy();
     if (stock.cards.length === 0 && talon.cards.length > 0) {
       stock.cards = talon.cards.map((card) => ({ ...card, showingFace: false }));
       talon.cards = [];
+      this.gameState.setStock(stock);
+      this.gameState.setTalon(talon);
+      this.gameState.incrementActionCount();
       this.notifyContextStateChange(true);
     } else {
       this.notifyContextStateChange(false);
@@ -172,35 +160,37 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     this.changeListeners.delete(callback);
   }
 
+  // Implements PlayingCardsContextListener.onValidDrop
   public onValidDrop(cardStackInfo: PlayingCardStackInfo, slotStackInfo: PlayingCardStackInfo) {
     let result = false;
+    const gameState = this.gameState;
     if (Utils.isTableauStack(cardStackInfo.stackId)) {
       // Move originated from tableau
       if (Utils.isTableauStack(slotStackInfo.stackId)) {
         // Target is another tableau
-        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
-        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        const card = gameState.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = gameState.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is always successful.
           result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
         } else if (card) {
-          const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          const slotParentCard = notNull(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
           if (!Utils.isSameColor(card, slotParentCard) && Utils.isNextInRank(card, slotParentCard)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
           }
         }
-      } else if (Utils.isFoundationStack(slotStackInfo.stackId) && this.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
+      } else if (Utils.isFoundationStack(slotStackInfo.stackId) && gameState.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
         // Target is foundation
-        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
-        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        const card = gameState.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = gameState.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is only successful if it is an ace.
           if (card && Utils.isAceRank(card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
           }
         } else if (card) {
-          const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          const slotParentCard = notNull(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
           if (Utils.isSameSuit(card, slotParentCard) && Utils.isNextInRank(slotParentCard, card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
@@ -211,29 +201,29 @@ export class SolitaireContextData implements PlayingCardsContextListener {
       // Move originated from talon
       if (Utils.isTableauStack(slotStackInfo.stackId)) {
         // Target is tableau
-        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
-        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        const card = gameState.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = gameState.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is always successful.
           result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
         } else if (card) {
-          const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          const slotParentCard = notNull(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
           if (!Utils.isSameColor(card, slotParentCard) && Utils.isNextInRank(card, slotParentCard)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         }
-      } else if (Utils.isFoundationStack(slotStackInfo.stackId) && this.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
+      } else if (Utils.isFoundationStack(slotStackInfo.stackId) && gameState.isTopCard(cardStackInfo.stackId, cardStackInfo.cardIndex)) {
         // Target is foundation
-        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
-        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        const card = gameState.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = gameState.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is only successful if it is an ace.
           if (card && Utils.isAceRank(card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         } else if (card) {
-          const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          const slotParentCard = notNull(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
           if (Utils.isSameSuit(card, slotParentCard) && Utils.isNextInRank(slotParentCard, card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
@@ -244,13 +234,13 @@ export class SolitaireContextData implements PlayingCardsContextListener {
       // Move originated from foundation
       if (Utils.isTableauStack(slotStackInfo.stackId)) {
         // Target is tableau
-        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
-        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        const card = gameState.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = gameState.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is always successful.
           result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
         } else if (card) {
-          const slotParentCard = notNull(this.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          const slotParentCard = notNull(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
           if (!Utils.isSameColor(card, slotParentCard) && Utils.isNextInRank(card, slotParentCard)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
@@ -258,8 +248,8 @@ export class SolitaireContextData implements PlayingCardsContextListener {
         }
       } else if (Utils.isFoundationStack(slotStackInfo.stackId)) {
         // Target is another foundation
-        const card = this.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
-        const slotHasCards = this.hasCards(slotStackInfo.stackId);
+        const card = gameState.getCard(cardStackInfo.stackId, cardStackInfo.cardIndex);
+        const slotHasCards = gameState.hasCards(slotStackInfo.stackId);
         if (!slotHasCards) {
           // No parent card; empty slot. Drop is successful.
           if (card && Utils.isAceRank(card)) {
@@ -270,10 +260,11 @@ export class SolitaireContextData implements PlayingCardsContextListener {
       }
     }
     if (result) {
-      this.actionCount++;
+      this.gameState.incrementActionCount();
     }
     this.notifyContextStateChange(result);
   }
+  // Implements PlayingCardsContextListener.onInvalidDrop
   public onInvalidDrop(_card: PlayingCardStackInfo) {
     this.notifyContextStateChange(false);
   }
@@ -281,10 +272,10 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   private moveBetweenStacks(card: PlayingCardStackInfo, slot: PlayingCardStackInfo, showCardParent: boolean): boolean {
     const sourceStackId = card.stackId as SolitaireCardStack;
     const sourceStackCardIndex = card.cardIndex;
-    const sourceStack = notNull(this.cardStacks[sourceStackId]);
+    const sourceStack = this.gameState.getStackCopy(sourceStackId);
     const targetStackId = slot.stackId as SolitaireCardStack;
     const targetStackCardIndex = slot.cardIndex;
-    const targetStack = notNull(this.cardStacks[targetStackId]);
+    const targetStack = this.gameState.getStackCopy(targetStackId);
 
     switch (sourceStack.meta.moveBehavior) {
       case OPlayingCardStackMoveBehavior.MoveAllNextSiblings: {
@@ -302,14 +293,14 @@ export class SolitaireContextData implements PlayingCardsContextListener {
           }
         }
         sourceStackCopy.cards = sourceStackCardsCopy;
-        this.cardStacks[sourceStackId] = sourceStackCopy;
+        this.gameState.setCardStack(sourceStackId, sourceStackCopy);
 
         // Add card and next siblings to target stack
         const targetStackCopy = { ...targetStack };
         const targetStackCardsCopy = [...targetStackCopy.cards];
         targetStackCardsCopy.splice(targetStackCardIndex, 0, ...cardsToMove);
         targetStackCopy.cards = targetStackCardsCopy;
-        this.cardStacks[targetStackId] = targetStackCopy;
+        this.gameState.setCardStack(targetStackId, targetStackCopy);
 
         break;
       }
@@ -333,14 +324,14 @@ export class SolitaireContextData implements PlayingCardsContextListener {
           }
         }
         sourceStackCopy.cards = sourceStackCardsCopy;
-        this.cardStacks[sourceStackId] = sourceStackCopy;
+        this.gameState.setCardStack(sourceStackId, sourceStackCopy);
 
         // Add the one card to the target stack
         const targetStackCopy = { ...targetStack };
         const targetStackCardsCopy = [...targetStackCopy.cards];
         targetStackCardsCopy.splice(targetStackCardIndex, 0, ...cardsToMove);
         targetStackCopy.cards = targetStackCardsCopy;
-        this.cardStacks[targetStackId] = targetStackCopy;
+        this.gameState.setCardStack(targetStackId, targetStackCopy);
         break;
       }
       case OPlayingCardStackMoveBehavior.MoveIndividually: {
@@ -361,64 +352,14 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     dropBehavior: PlayingCardStackDropBehavior,
     cards: PlayingCardList = [],
   ) {
-    this.cardStacks[id] = {
+    this.gameState.setCardStack(id, {
       meta: {
         id,
         moveBehavior,
         dropBehavior,
       },
       cards,
-    };
-  }
-
-  private hasCards(stackId: SolitaireCardStack): boolean {
-    const stack = this.getStack(stackId);
-    if (!stack) {
-      console.error('Invalid card stack: -1');
-      return false;
-    }
-    return stack.cards.length > 0;
-  }
-
-  private hasHiddenCards(stackId: SolitaireCardStack): boolean {
-    const stack = this.getStack(stackId);
-    if (!stack) {
-      console.error('Invalid card stack: -2');
-      return false;
-    }
-    for (let idx = 0; idx < stack.cards.length; idx++) {
-      if (!stack.cards[idx].showingFace) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private isTopCard(stackId: SolitaireCardStack, cardIdx: number): boolean {
-    const stack = this.getStack(stackId);
-    if (!stack) {
-      console.error('Invalid card stack: -3');
-      return false;
-    }
-    return stack.cards.length - 1 === cardIdx;
-  }
-
-  private getCard(stackId: SolitaireCardStack, cardIdx: number): PlayingCard | null {
-    const stack = this.getStack(stackId);
-    if (!stack) {
-      console.error('Invalid card stack: -4');
-      return null;
-    }
-    if (cardIdx < 0 || cardIdx >= stack.cards.length) {
-      console.error('Invalid card index: -5');
-      return null;
-    }
-    const card = stack.cards[cardIdx];
-    if (!card) {
-      console.error(`Card not found at index ${cardIdx}`);
-      return null;
-    }
-    return card;
+    });
   }
 
   private notifyContextStateChange(modelChanged: boolean) {

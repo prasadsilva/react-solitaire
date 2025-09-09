@@ -1,7 +1,8 @@
 import type { PlayingCardStackData, PlayingCardStackView } from '@/playing-cards/context/types';
+import type { Immutable } from '@/utils';
 
 export type StackablePlayingCardProps = {
-  data: PlayingCardStackData;
+  data: Immutable<PlayingCardStackData>;
   view: PlayingCardStackView;
   index: number;
   dataIndex: number;
@@ -9,7 +10,7 @@ export type StackablePlayingCardProps = {
 };
 
 export type StackablePlayingCardsStackProps = {
-  data: PlayingCardStackData;
+  data: Immutable<PlayingCardStackData>;
   view: PlayingCardStackView;
   firstCardDataIndex: number;
 };

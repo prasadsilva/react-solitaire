@@ -1,5 +1,5 @@
 import { StackablePlayingCards } from '@/playing-cards/components/stackable-playing-card';
-import type { PlayingCanvasPosition, PlayingCardStackData, PlayingCardStackView } from '@/playing-cards/context/types';
+import type { PlayingCanvasPosition, PlayingCardStackView } from '@/playing-cards/context/types';
 import { LAYOUT_CONSTANTS } from '@/solitaire/context/constants';
 import { SolitaireHooks } from '@/solitaire/context/solitaire-context';
 import type { SolitaireTableauStack } from '@/solitaire/context/types';
@@ -14,7 +14,7 @@ export type SolitaireTableauPileProps = Immutable<{
 
 export function SolitaireTableauPile({ tableauId, position, ...props }: SolitaireTableauPileProps) {
   const { tableauMeta, tableauCards } = SolitaireHooks.useTableau(tableauId);
-  const data = useMemo<PlayingCardStackData>(
+  const data = useMemo(
     () => ({
       meta: tableauMeta,
       cards: tableauCards,
