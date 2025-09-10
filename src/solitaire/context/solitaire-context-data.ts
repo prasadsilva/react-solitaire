@@ -1,16 +1,8 @@
-import {
-  OPlayingCardStackDropBehavior,
-  OPlayingCardStackMoveBehavior,
-  type PlayingCardList,
-  type PlayingCardStackBehavior,
-  type PlayingCardStackDropBehavior,
-  type PlayingCardStackInfo,
-} from '@/playing-cards/context/types';
+import { OPlayingCardStackMoveBehavior, type PlayingCardStackInfo } from '@/playing-cards/context/types';
 import { notNull } from '@/utils';
 import type { PlayingCardsContextListener } from '../../playing-cards/context/playing-cards-context';
-import { generateNewSolitaireGameData } from './deck-builder';
 import SolitaireGameState from './solitaire-game-state';
-import { OSolitaireCardStack, OSolitaireDebugState, type SolitaireCardStack, type SolitaireDebugState } from './types';
+import { OSolitaireDebugState, type SolitaireCardStack, type SolitaireDebugState } from './types';
 import Utils from './utils';
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
@@ -23,79 +15,6 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   public constructor(savedGameState?: SolitaireGameState) {
     this.gameState = savedGameState ?? new SolitaireGameState();
     this.changeListeners = new Set();
-
-    if (!savedGameState) {
-      const newSolitaireGameData = generateNewSolitaireGameData();
-      this.registerStack(
-        OSolitaireCardStack.Stock,
-        OPlayingCardStackMoveBehavior.Immovable,
-        OPlayingCardStackDropBehavior.NotAccepting,
-        newSolitaireGameData.drawCards,
-      );
-      this.registerStack(OSolitaireCardStack.Talon, OPlayingCardStackMoveBehavior.MoveOnlyTop, OPlayingCardStackDropBehavior.NotAccepting);
-      this.registerStack(
-        OSolitaireCardStack.Foundation1,
-        OPlayingCardStackMoveBehavior.MoveOnlyTop,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-      );
-      this.registerStack(
-        OSolitaireCardStack.Foundation2,
-        OPlayingCardStackMoveBehavior.MoveOnlyTop,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-      );
-      this.registerStack(
-        OSolitaireCardStack.Foundation3,
-        OPlayingCardStackMoveBehavior.MoveOnlyTop,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-      );
-      this.registerStack(
-        OSolitaireCardStack.Foundation4,
-        OPlayingCardStackMoveBehavior.MoveOnlyTop,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-      );
-      this.registerStack(
-        OSolitaireCardStack.Tableau1,
-        OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-        newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau1],
-      );
-      this.registerStack(
-        OSolitaireCardStack.Tableau2,
-        OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-        newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau2],
-      );
-      this.registerStack(
-        OSolitaireCardStack.Tableau3,
-        OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-        newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau3],
-      );
-      this.registerStack(
-        OSolitaireCardStack.Tableau4,
-        OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-        newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau4],
-      );
-      this.registerStack(
-        OSolitaireCardStack.Tableau5,
-        OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-        newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau5],
-      );
-      this.registerStack(
-        OSolitaireCardStack.Tableau6,
-        OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-        newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau6],
-      );
-      this.registerStack(
-        OSolitaireCardStack.Tableau7,
-        OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
-        OPlayingCardStackDropBehavior.AcceptsAny,
-        newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau7],
-      );
-    }
   }
 
   public getElapsedTime(): number {
@@ -346,22 +265,6 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     }
 
     return true;
-  }
-
-  private registerStack(
-    id: SolitaireCardStack,
-    moveBehavior: PlayingCardStackBehavior,
-    dropBehavior: PlayingCardStackDropBehavior,
-    cards: PlayingCardList = [],
-  ) {
-    this.gameState.setCardStack(id, {
-      meta: {
-        id,
-        moveBehavior,
-        dropBehavior,
-      },
-      cards,
-    });
   }
 
   private notifyContextStateChange(modelChanged: boolean) {

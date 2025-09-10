@@ -1,5 +1,14 @@
-import type { PlayingCard, PlayingCardStackData } from '@/playing-cards/context/types';
+import {
+  OPlayingCardStackDropBehavior,
+  OPlayingCardStackMoveBehavior,
+  type PlayingCard,
+  type PlayingCardList,
+  type PlayingCardStackBehavior,
+  type PlayingCardStackData,
+  type PlayingCardStackDropBehavior,
+} from '@/playing-cards/context/types';
 import { deepCopy, notNull, type Immutable } from '@/utils';
+import { generateNewSolitaireGameData } from './deck-builder';
 import { OSolitaireCardStack, OSolitaireTableauStack, type SolitaireCardStack } from './types';
 
 type SolitaireCardStackMap = { [K in SolitaireCardStack]?: PlayingCardStackData };
@@ -14,6 +23,7 @@ class SolitaireGameState {
       this.#loadFromSavedState();
     } else {
       this.#clearSavedState();
+      this.#setupNewGame();
     }
   }
 
@@ -159,6 +169,95 @@ class SolitaireGameState {
       return true;
     }
     return false;
+  }
+
+  #setupNewGame(): void {
+    const newSolitaireGameData = generateNewSolitaireGameData();
+    this.#registerStack(
+      OSolitaireCardStack.Stock,
+      OPlayingCardStackMoveBehavior.Immovable,
+      OPlayingCardStackDropBehavior.NotAccepting,
+      newSolitaireGameData.drawCards,
+    );
+    this.#registerStack(OSolitaireCardStack.Talon, OPlayingCardStackMoveBehavior.MoveOnlyTop, OPlayingCardStackDropBehavior.NotAccepting);
+    this.#registerStack(
+      OSolitaireCardStack.Foundation1,
+      OPlayingCardStackMoveBehavior.MoveOnlyTop,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.#registerStack(
+      OSolitaireCardStack.Foundation2,
+      OPlayingCardStackMoveBehavior.MoveOnlyTop,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.#registerStack(
+      OSolitaireCardStack.Foundation3,
+      OPlayingCardStackMoveBehavior.MoveOnlyTop,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.#registerStack(
+      OSolitaireCardStack.Foundation4,
+      OPlayingCardStackMoveBehavior.MoveOnlyTop,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+    );
+    this.#registerStack(
+      OSolitaireCardStack.Tableau1,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau1],
+    );
+    this.#registerStack(
+      OSolitaireCardStack.Tableau2,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau2],
+    );
+    this.#registerStack(
+      OSolitaireCardStack.Tableau3,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau3],
+    );
+    this.#registerStack(
+      OSolitaireCardStack.Tableau4,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau4],
+    );
+    this.#registerStack(
+      OSolitaireCardStack.Tableau5,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau5],
+    );
+    this.#registerStack(
+      OSolitaireCardStack.Tableau6,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau6],
+    );
+    this.#registerStack(
+      OSolitaireCardStack.Tableau7,
+      OPlayingCardStackMoveBehavior.MoveAllNextSiblings,
+      OPlayingCardStackDropBehavior.AcceptsAny,
+      newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau7],
+    );
+  }
+
+  #registerStack(
+    id: SolitaireCardStack,
+    moveBehavior: PlayingCardStackBehavior,
+    dropBehavior: PlayingCardStackDropBehavior,
+    cards: PlayingCardList = [],
+  ) {
+    this.setCardStack(id, {
+      meta: {
+        id,
+        moveBehavior,
+        dropBehavior,
+      },
+      cards,
+    });
   }
 }
 
