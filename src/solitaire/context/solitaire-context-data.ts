@@ -20,8 +20,8 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   private changeListeners: Set<SolitaireContextChangeListener>;
   private debugStates: { [K in SolitaireDebugState]: boolean } = { [OSolitaireDebugState.GameOver]: false };
 
-  public constructor() {
-    this.gameState = new SolitaireGameState();
+  public constructor(savedGameState?: SolitaireGameState) {
+    this.gameState = savedGameState ?? new SolitaireGameState();
     this.changeListeners = new Set();
 
     const newSolitaireGameData = generateNewSolitaireGameData();

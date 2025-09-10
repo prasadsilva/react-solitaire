@@ -2,7 +2,7 @@ import { ThemeToggle } from '@/components/theme';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useMemo } from 'react';
-import { SolitaireHooks } from '../context/solitaire-context';
+import { SolitaireHooks } from '../context/solitaire-hooks';
 import SolitaireInfoPopup from './popups/SolitaireInfoPopup';
 
 // Format time as HH:MM:SS

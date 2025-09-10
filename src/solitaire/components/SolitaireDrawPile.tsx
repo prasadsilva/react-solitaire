@@ -2,7 +2,7 @@ import CardBack from '@/playing-cards/assets/1B.svg';
 import CardOutline from '@/playing-cards/assets/outline.svg?react';
 import type { PlayingCanvasPosition } from '@/playing-cards/context/types';
 import { CARD_DIMS_CLASS } from '@/solitaire/context/constants';
-import { SolitaireHooks } from '@/solitaire/context/solitaire-context';
+import { SolitaireHooks } from '@/solitaire/context/solitaire-hooks';
 import { cn, type Immutable } from '@/utils';
 import { useCallback, useMemo, type ComponentProps } from 'react';
 
