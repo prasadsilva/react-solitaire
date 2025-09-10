@@ -26,9 +26,14 @@ function useGameState() {
     context._debugSetGameOver();
   }, [context]);
 
+  const _debugClearBestTimes = useCallback(() => {
+    context._debugClearBestTimes();
+  }, [context]);
+
   return {
     gameOver,
     _debugSetGameOver,
+    _debugClearBestTimes,
   };
 }
 
@@ -37,7 +42,7 @@ function useElapsedTime() {
   if (!context) {
     throw new Error('useGameState must be used within a SolitaireContext');
   }
-  const [elapsedSeconds, setElapsedSeconds] = useState(Math.floor(context.getElapsedTime() / 1000));
+  const [elapsedSeconds, setElapsedSeconds] = useState(context.getElapsedTimeInSeconds());
   const [intervalId, setIntervalId] = useState(-1);
   const { gameOver } = useGameState();
 
@@ -45,9 +50,9 @@ function useElapsedTime() {
     if (gameOver) {
       return;
     }
-    setElapsedSeconds(Math.floor(context.getElapsedTime() / 1000));
+    setElapsedSeconds(context.getElapsedTimeInSeconds());
     const handle = setInterval(() => {
-      setElapsedSeconds(Math.floor(context.getElapsedTime() / 1000));
+      setElapsedSeconds(context.getElapsedTimeInSeconds());
     }, 1000);
     setIntervalId(handle);
 

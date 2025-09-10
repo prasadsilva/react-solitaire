@@ -7,8 +7,9 @@ import {
   type PlayingCardStackData,
   type PlayingCardStackDropBehavior,
 } from '@/playing-cards/context/types';
-import { deepCopy, notNull, type Immutable } from '@/utils';
+import { deepCopy, exists, type Immutable } from '@/utils';
 import { generateNewSolitaireGameData } from './deck-builder';
+import { registerNewHistoryTime } from './game-history';
 import { OSolitaireCardStack, OSolitaireTableauStack, type SolitaireCardStack } from './types';
 
 type SolitaireCardStackMap = { [K in SolitaireCardStack]?: PlayingCardStackData };
@@ -16,6 +17,8 @@ type SolitaireCardStackMap = { [K in SolitaireCardStack]?: PlayingCardStackData 
 class SolitaireGameState {
   #cardStacks: SolitaireCardStackMap = {};
   #startTime: number = Date.now();
+  #gameOver: boolean = false;
+  #gameOverTime: number = -1;
   #actionCount: number = 0;
 
   constructor(restoreGame?: boolean) {
@@ -39,12 +42,19 @@ class SolitaireGameState {
     return this.#actionCount;
   }
 
-  get elapsedTime() {
+  get gameOver() {
+    return this.#gameOver;
+  }
+
+  get elapsedTimeInSeconds() {
+    if (this.#gameOver) {
+      return this.#gameOverTime;
+    }
     if (this.#actionCount === 0) {
       this.#startTime = Date.now();
       return 0;
     }
-    return Date.now() - this.#startTime;
+    return Math.floor((Date.now() - this.#startTime) / 1000);
   }
 
   incrementActionCount() {
@@ -52,44 +62,57 @@ class SolitaireGameState {
     this.#saveState();
   }
 
+  isStackValid(stackId: SolitaireCardStack): boolean {
+    return !!this.#cardStacks[stackId];
+  }
   getStack(stackId: SolitaireCardStack): Immutable<PlayingCardStackData> {
-    return notNull(this.#cardStacks[stackId]);
+    return exists(this.#cardStacks[stackId]);
   }
   getStackCopy(sourceStackId: SolitaireCardStack): PlayingCardStackData {
-    return deepCopy(notNull(this.#cardStacks[sourceStackId]));
+    return deepCopy(exists(this.#cardStacks[sourceStackId]));
   }
   setCardStack(id: SolitaireCardStack, data: PlayingCardStackData) {
     this.#cardStacks[id] = data;
-    this.#saveState();
+    this.#handleStateChanged();
   }
 
   getStock(): Immutable<PlayingCardStackData> {
-    return notNull(this.#cardStacks[OSolitaireCardStack.Stock]);
+    return exists(this.#cardStacks[OSolitaireCardStack.Stock]);
   }
   getStockCopy(): PlayingCardStackData {
-    return deepCopy(notNull(this.#cardStacks[OSolitaireCardStack.Stock]));
+    return deepCopy(exists(this.#cardStacks[OSolitaireCardStack.Stock]));
   }
   setStock(data: PlayingCardStackData) {
     this.#cardStacks[OSolitaireCardStack.Stock] = data;
-    this.#saveState();
+    this.#handleStateChanged();
   }
 
   getTalon(): Immutable<PlayingCardStackData> {
-    return notNull(this.#cardStacks[OSolitaireCardStack.Talon]);
+    return exists(this.#cardStacks[OSolitaireCardStack.Talon]);
   }
   getTalonCopy(): PlayingCardStackData {
-    return deepCopy(notNull(this.#cardStacks[OSolitaireCardStack.Talon]));
+    return deepCopy(exists(this.#cardStacks[OSolitaireCardStack.Talon]));
   }
   setTalon(data: PlayingCardStackData) {
     this.#cardStacks[OSolitaireCardStack.Talon] = data;
-    this.#saveState();
+    this.#handleStateChanged();
   }
 
-  isGameOver(): boolean {
+  #checkGameOver(): void {
+    if (this.#gameOver) {
+      return;
+    }
     // If there are no more stock/talon cards and all tableau cards are showing face, then the game is effectively over.
     const tableauStackKeys = Object.values(OSolitaireTableauStack);
-    const areAllTableauCardsShowingFace = tableauStackKeys.reduce((accum, key) => accum && !this.hasHiddenCards(key), true);
-    return this.getStock().cards.length === 0 && this.getTalon().cards.length === 0 && areAllTableauCardsShowingFace;
+    const areAllTableauCardsShowingFace = tableauStackKeys.reduce(
+      (accum, key) => accum && this.isStackValid(key) && !this.hasHiddenCards(key),
+      true,
+    );
+    this.#gameOver = this.getStock().cards.length === 0 && this.getTalon().cards.length === 0 && areAllTableauCardsShowingFace;
+    if (this.#gameOver) {
+      this.#gameOverTime = this.elapsedTimeInSeconds;
+      registerNewHistoryTime(this.#gameOverTime);
+    }
   }
 
   hasCards(stackId: SolitaireCardStack): boolean {
@@ -142,12 +165,19 @@ class SolitaireGameState {
     return card;
   }
 
+  #handleStateChanged() {
+    this.#checkGameOver();
+    this.#saveState();
+  }
+
   #saveState() {
     // TODO: debounce this?
     const saveState = JSON.stringify({
       '#cardStacks': this.#cardStacks,
       '#actionCount': this.#actionCount,
       '#startTime': this.#startTime,
+      '#gameOver': this.#gameOver,
+      '#gameOverTime': this.#gameOverTime,
     });
     localStorage.setItem('savedState', saveState);
   }
@@ -166,6 +196,8 @@ class SolitaireGameState {
       this.#cardStacks = savedState['#cardStacks'];
       this.#actionCount = savedState['#actionCount'];
       this.#startTime = savedState['#startTime'];
+      this.#gameOver = savedState['#gameOver'];
+      this.#gameOverTime = savedState['#gameOverTime'];
       return true;
     }
     return false;
@@ -250,14 +282,14 @@ class SolitaireGameState {
     dropBehavior: PlayingCardStackDropBehavior,
     cards: PlayingCardList = [],
   ) {
-    this.setCardStack(id, {
+    this.#cardStacks[id] = {
       meta: {
         id,
         moveBehavior,
         dropBehavior,
       },
       cards,
-    });
+    };
   }
 }
 

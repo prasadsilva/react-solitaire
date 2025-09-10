@@ -12,7 +12,7 @@ type SolitaireGameTitleBarProps = {
 };
 function SolitaireGameTitleBar({ startNewGame }: SolitaireGameTitleBarProps) {
   const debugModeEnabled = useMemo(() => import.meta.env.DEV, []);
-  const { _debugSetGameOver } = SolitaireHooks.useGameState();
+  const { _debugSetGameOver, _debugClearBestTimes } = SolitaireHooks.useGameState();
   const { elapsedSeconds } = SolitaireHooks.useElapsedTime();
 
   return (
@@ -31,6 +31,7 @@ function SolitaireGameTitleBar({ startNewGame }: SolitaireGameTitleBarProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onClick={_debugSetGameOver}>Trigger game over</DropdownMenuItem>
+              <DropdownMenuItem onClick={_debugClearBestTimes}>Clear best times</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}

@@ -1,6 +1,7 @@
 import { OPlayingCardStackMoveBehavior, type PlayingCardStackInfo } from '@/playing-cards/context/types';
-import { notNull } from '@/utils';
+import { exists } from '@/utils';
 import type { PlayingCardsContextListener } from '../../playing-cards/context/playing-cards-context';
+import { clearBestTimes, registerNewHistoryTime } from './game-history';
 import SolitaireGameState from './solitaire-game-state';
 import { OSolitaireDebugState, type SolitaireCardStack, type SolitaireDebugState } from './types';
 import Utils from './utils';
@@ -17,20 +18,25 @@ export class SolitaireContextData implements PlayingCardsContextListener {
     this.changeListeners = new Set();
   }
 
-  public getElapsedTime(): number {
-    return this.gameState.elapsedTime;
+  public getElapsedTimeInSeconds(): number {
+    return this.gameState.elapsedTimeInSeconds;
   }
 
   public _debugSetGameOver() {
     this.debugStates[OSolitaireDebugState.GameOver] = true;
+    registerNewHistoryTime(this.gameState.elapsedTimeInSeconds);
     this.notifyContextStateChange(false);
+  }
+
+  public _debugClearBestTimes() {
+    clearBestTimes();
   }
 
   public isGameOver(): boolean {
     if (this.debugStates[OSolitaireDebugState.GameOver]) {
       return true;
     }
-    return this.gameState.isGameOver();
+    return this.gameState.gameOver;
   }
 
   public getStock() {
@@ -95,7 +101,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
           // No parent card; empty slot. Drop is always successful.
           result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
         } else if (card) {
-          const slotParentCard = notNull(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          const slotParentCard = exists(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
           if (!Utils.isSameColor(card, slotParentCard) && Utils.isNextInRank(card, slotParentCard)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
@@ -111,7 +117,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
           }
         } else if (card) {
-          const slotParentCard = notNull(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          const slotParentCard = exists(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
           if (Utils.isSameSuit(card, slotParentCard) && Utils.isNextInRank(slotParentCard, card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, true);
@@ -128,7 +134,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
           // No parent card; empty slot. Drop is always successful.
           result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
         } else if (card) {
-          const slotParentCard = notNull(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          const slotParentCard = exists(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
           if (!Utils.isSameColor(card, slotParentCard) && Utils.isNextInRank(card, slotParentCard)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
@@ -144,7 +150,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
           }
         } else if (card) {
-          const slotParentCard = notNull(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          const slotParentCard = exists(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has same suit
           if (Utils.isSameSuit(card, slotParentCard) && Utils.isNextInRank(slotParentCard, card)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
@@ -161,7 +167,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
           // No parent card; empty slot. Drop is always successful.
           result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);
         } else if (card) {
-          const slotParentCard = notNull(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
+          const slotParentCard = exists(gameState.getCard(slotStackInfo.stackId, slotStackInfo.cardIndex - 1));
           // Has parent card. Drop is only successful if a) the parent is a rank below card and b) parent has opposite color
           if (!Utils.isSameColor(card, slotParentCard) && Utils.isNextInRank(card, slotParentCard)) {
             result = this.moveBetweenStacks(cardStackInfo, slotStackInfo, false);

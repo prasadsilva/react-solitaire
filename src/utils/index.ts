@@ -106,9 +106,9 @@ export function objectHasValue<T>(object: { [key: string]: T }, value: T) {
   return Object.values(object).includes(value);
 }
 
-export function notNull<T>(value: T | null | undefined): NonNullable<T> {
-  if (value === null) {
-    throw new Error('Value is expected to be not null!');
+export function exists<T>(value: T | null | undefined): NonNullable<T> {
+  if (!value) {
+    throw new Error('Value is expected to be valid!');
   }
   return value as NonNullable<T>;
 }
