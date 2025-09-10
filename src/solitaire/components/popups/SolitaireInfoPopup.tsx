@@ -16,6 +16,12 @@ function SolitaireGameTitleBar() {
           <DialogDescription>An exploration in creating a Solitaire game using React.</DialogDescription>
         </DialogHeader>
         <span>
+          The code can be found{' '}
+          <a href="https://github.com/prasadsilva/react-solitaire" target="_blank" className="underline">
+            here.
+          </a>
+        </span>
+        <span>
           Playing card SVGs provided by{' '}
           <a href="https://www.me.uk/cards/" target="_blank" className="underline">
             Adrian Kennard (RevK®)
