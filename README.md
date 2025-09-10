@@ -10,7 +10,6 @@ An exploration in creating a Solitaire game using React.
   - Debug: save current time to top 10
   - Debug: clear top 10
   - Popup to show top 10 times
-- Save game state in local storage
 
 ## Tech debt
 

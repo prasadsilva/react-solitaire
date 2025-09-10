@@ -42,6 +42,9 @@ function useElapsedTime() {
   const { gameOver } = useGameState();
 
   useEffect(() => {
+    if (gameOver) {
+      return;
+    }
     setElapsedSeconds(Math.floor(context.getElapsedTime() / 1000));
     const handle = setInterval(() => {
       setElapsedSeconds(Math.floor(context.getElapsedTime() / 1000));
@@ -56,7 +59,7 @@ function useElapsedTime() {
         }
       }
     };
-  }, [context]);
+  }, [context, gameOver]);
 
   useEffect(() => {
     if (gameOver) {

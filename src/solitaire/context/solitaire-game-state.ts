@@ -9,6 +9,14 @@ class SolitaireGameState {
   #startTime: number = Date.now();
   #actionCount: number = 0;
 
+  constructor(restoreGame?: boolean) {
+    if (restoreGame) {
+      this.#loadFromSavedState();
+    } else {
+      this.#clearSavedState();
+    }
+  }
+
   get cardStacks(): Immutable<SolitaireCardStackMap> {
     return this.#cardStacks;
   }
@@ -31,6 +39,7 @@ class SolitaireGameState {
 
   incrementActionCount() {
     this.#actionCount++;
+    this.#saveState();
   }
 
   getStack(stackId: SolitaireCardStack): Immutable<PlayingCardStackData> {
@@ -41,6 +50,7 @@ class SolitaireGameState {
   }
   setCardStack(id: SolitaireCardStack, data: PlayingCardStackData) {
     this.#cardStacks[id] = data;
+    this.#saveState();
   }
 
   getStock(): Immutable<PlayingCardStackData> {
@@ -51,6 +61,7 @@ class SolitaireGameState {
   }
   setStock(data: PlayingCardStackData) {
     this.#cardStacks[OSolitaireCardStack.Stock] = data;
+    this.#saveState();
   }
 
   getTalon(): Immutable<PlayingCardStackData> {
@@ -61,6 +72,7 @@ class SolitaireGameState {
   }
   setTalon(data: PlayingCardStackData) {
     this.#cardStacks[OSolitaireCardStack.Talon] = data;
+    this.#saveState();
   }
 
   isGameOver(): boolean {
@@ -118,6 +130,35 @@ class SolitaireGameState {
       return null;
     }
     return card;
+  }
+
+  #saveState() {
+    // TODO: debounce this?
+    const saveState = JSON.stringify({
+      '#cardStacks': this.#cardStacks,
+      '#actionCount': this.#actionCount,
+      '#startTime': this.#startTime,
+    });
+    localStorage.setItem('savedState', saveState);
+  }
+
+  #clearSavedState() {
+    localStorage.removeItem('savedState');
+  }
+
+  #loadFromSavedState(): boolean {
+    const savedData = localStorage.getItem('savedState');
+    if (!savedData) {
+      return false;
+    }
+    const savedState = JSON.parse(savedData);
+    if (savedState instanceof Object) {
+      this.#cardStacks = savedState['#cardStacks'];
+      this.#actionCount = savedState['#actionCount'];
+      this.#startTime = savedState['#startTime'];
+      return true;
+    }
+    return false;
   }
 }
 

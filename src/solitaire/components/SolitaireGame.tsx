@@ -1,13 +1,17 @@
 import { ThemeProvider } from '@/components/theme';
 import { createNewPlayingCardsContextValue, PlayingCardsContext } from '@/playing-cards/context/playing-cards-context';
 import { SolitaireCanvas } from '@/solitaire/components/SolitaireCanvas';
-import { createNewSolitaireContextValue, SolitaireContext } from '@/solitaire/context/solitaire-context';
+import {
+  createNewSolitaireContextValue,
+  getSavedOrCreateNewSolitaireContextValue,
+  SolitaireContext,
+} from '@/solitaire/context/solitaire-context';
 import { useCallback, useState } from 'react';
 import SolitaireGameOverPopup from './popups/SolitaireGameOverPopup';
 import SolitaireGameTitleBar from './SolitaireGameTitleBar';
 
 function SolitaireGame() {
-  const [solitaireGame, setSolitaireGame] = useState(createNewSolitaireContextValue());
+  const [solitaireGame, setSolitaireGame] = useState(getSavedOrCreateNewSolitaireContextValue());
   const startNewGame = useCallback(() => {
     setSolitaireGame(createNewSolitaireContextValue());
   }, []);
