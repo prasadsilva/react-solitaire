@@ -6,6 +6,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Format time as HH:MM:SS
+export const formatSecondsToTimeString = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+
 export type Immutable<T> = {
   readonly [K in keyof T]: T[K] extends (infer U)[]
     ? readonly Immutable<U>[]
