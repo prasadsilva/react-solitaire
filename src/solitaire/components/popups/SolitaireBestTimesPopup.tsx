@@ -1,11 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { getBestTimes, type HistoryItem } from '@/solitaire/context/game-history';
+import { type HistoryItem } from '@/solitaire/context/game-history';
+import { SolitaireHooks } from '@/solitaire/context/solitaire-hooks';
 import { formatSecondsToTimeString } from '@/utils';
 import { TableProperties } from 'lucide-react';
 
 function SolitaireBestTimesPopup() {
-  const bestTimes: HistoryItem[] = getBestTimes();
+  const { bestTimes } = SolitaireHooks.useGameState();
 
   const itemsToRender: (HistoryItem | null)[] = [];
   for (let idx = 0; idx < 10; idx++) {
@@ -34,7 +35,7 @@ function SolitaireBestTimesPopup() {
           {itemsToRender.map((item, idx) => (
             <li key={`best-time-${idx}`}>
               <div className="flex flex-row gap-3">
-                <div>{idx}.</div>
+                <div>{idx + 1}.</div>
                 {item ? (
                   <>
                     <div>{formatSecondsToTimeString(item.secondsElapsed)}</div>

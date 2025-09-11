@@ -28,6 +28,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
 
   public _debugClearBestTimes() {
     clearBestTimes();
+    this.notifyContextStateChange(false);
   }
 
   public isGameOver(): boolean {

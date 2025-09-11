@@ -5,12 +5,10 @@ import { useEffect, useState } from 'react';
 function SolitaireGameOverPopup() {
   const { gameOver } = SolitaireHooks.useGameState();
 
-  const [showGameOverScreen, setShowGameOverScreen] = useState(false);
+  const [showGameOverScreen, setShowGameOverScreen] = useState(gameOver);
   const [showingGameOverScreen, setShowingGameOverScreen] = useState(false);
   useEffect(() => {
-    if (!showGameOverScreen && gameOver) {
-      setShowGameOverScreen(true);
-    }
+    setShowGameOverScreen(gameOver);
   }, [gameOver]);
   useEffect(() => {
     if (showGameOverScreen) {

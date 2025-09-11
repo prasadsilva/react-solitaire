@@ -1,4 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { getBestTimes, type HistoryItem } from './game-history';
 import { _SolitaireContextImpl } from './solitaire-context';
 import type { SolitaireFoundationStack, SolitaireTableauStack } from './types';
 
@@ -8,10 +9,12 @@ function useGameState() {
     throw new Error('useGameState must be used within a SolitaireContext');
   }
   const [gameOver, setGameOver] = useState(context.isGameOver());
+  const [gameHistory, setGameHistory] = useState<HistoryItem[]>(getBestTimes());
 
   const handleContextChange = useCallback(
     (_modelChanged: boolean) => {
       setGameOver(context.isGameOver());
+      setGameHistory(getBestTimes());
     },
     [context],
   );
@@ -19,6 +22,7 @@ function useGameState() {
   useEffect(() => {
     context.addChangeListener(handleContextChange);
     setGameOver(context.isGameOver());
+    setGameHistory(getBestTimes());
     return () => context.removeChangeListener(handleContextChange);
   }, [context]);
 
@@ -32,6 +36,7 @@ function useGameState() {
 
   return {
     gameOver,
+    bestTimes: gameHistory,
     _debugSetGameOver,
     _debugClearBestTimes,
   };

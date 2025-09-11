@@ -12,6 +12,8 @@ import { generateNewSolitaireGameData } from './deck-builder';
 import { registerNewHistoryTime } from './game-history';
 import { OSolitaireCardStack, OSolitaireTableauStack, type SolitaireCardStack } from './types';
 
+const savedStateKey = 'savedState';
+
 type SolitaireCardStackMap = { [K in SolitaireCardStack]?: PlayingCardStackData };
 
 class SolitaireGameState {
@@ -49,7 +51,7 @@ class SolitaireGameState {
 
   _debugSetGameOver() {
     this.#setGameOver();
-    this.#saveState();
+    this.#handleStateChanged();
   }
 
   get elapsedTimeInSeconds() {
@@ -193,15 +195,15 @@ class SolitaireGameState {
       '#gameOver': this.#gameOver,
       '#gameOverTime': this.#gameOverTime,
     });
-    localStorage.setItem('savedState', saveState);
+    localStorage.setItem(savedStateKey, saveState);
   }
 
   #clearSavedState() {
-    localStorage.removeItem('savedState');
+    localStorage.removeItem(savedStateKey);
   }
 
   #loadFromSavedState(): boolean {
-    const savedData = localStorage.getItem('savedState');
+    const savedData = localStorage.getItem(savedStateKey);
     if (!savedData) {
       return false;
     }
