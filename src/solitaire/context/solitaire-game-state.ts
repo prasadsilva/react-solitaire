@@ -23,11 +23,12 @@ class SolitaireGameState {
 
   constructor(restoreGame?: boolean) {
     if (restoreGame) {
-      this.#loadFromSavedState();
-    } else {
-      this.#clearSavedState();
-      this.#setupNewGame();
+      if (this.#loadFromSavedState()) {
+        return;
+      }
     }
+    this.#clearSavedState();
+    this.#setupNewGame();
   }
 
   get cardStacks(): Immutable<SolitaireCardStackMap> {
@@ -54,6 +55,10 @@ class SolitaireGameState {
       this.#startTime = Date.now();
       return 0;
     }
+    return this.#computeElapsedTimeInSeconds();
+  }
+
+  #computeElapsedTimeInSeconds() {
     return Math.floor((Date.now() - this.#startTime) / 1000);
   }
 
@@ -110,7 +115,7 @@ class SolitaireGameState {
     );
     this.#gameOver = this.getStock().cards.length === 0 && this.getTalon().cards.length === 0 && areAllTableauCardsShowingFace;
     if (this.#gameOver) {
-      this.#gameOverTime = this.elapsedTimeInSeconds;
+      this.#gameOverTime = this.#computeElapsedTimeInSeconds();
       registerNewHistoryTime(this.#gameOverTime);
     }
   }
@@ -274,6 +279,7 @@ class SolitaireGameState {
       OPlayingCardStackDropBehavior.AcceptsAny,
       newSolitaireGameData.tableauCards[OSolitaireCardStack.Tableau7],
     );
+    this.#saveState();
   }
 
   #registerStack(
