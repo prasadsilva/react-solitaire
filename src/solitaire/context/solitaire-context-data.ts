@@ -1,9 +1,9 @@
 import { OPlayingCardStackMoveBehavior, type PlayingCardStackInfo } from '@/playing-cards/context/types';
 import { exists } from '@/utils';
 import type { PlayingCardsContextListener } from '../../playing-cards/context/playing-cards-context';
-import { clearBestTimes, registerNewHistoryTime } from './game-history';
+import { clearBestTimes } from './game-history';
 import SolitaireGameState from './solitaire-game-state';
-import { OSolitaireDebugState, type SolitaireCardStack, type SolitaireDebugState } from './types';
+import { type SolitaireCardStack } from './types';
 import Utils from './utils';
 
 type SolitaireContextChangeListener = (modelChanged: boolean) => void;
@@ -11,7 +11,6 @@ type SolitaireContextChangeListener = (modelChanged: boolean) => void;
 export class SolitaireContextData implements PlayingCardsContextListener {
   private gameState: SolitaireGameState;
   private changeListeners: Set<SolitaireContextChangeListener>;
-  private debugStates: { [K in SolitaireDebugState]: boolean } = { [OSolitaireDebugState.GameOver]: false };
 
   public constructor(savedGameState?: SolitaireGameState) {
     this.gameState = savedGameState ?? new SolitaireGameState();
@@ -23,8 +22,7 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   }
 
   public _debugSetGameOver() {
-    this.debugStates[OSolitaireDebugState.GameOver] = true;
-    registerNewHistoryTime(this.gameState.elapsedTimeInSeconds);
+    this.gameState._debugSetGameOver();
     this.notifyContextStateChange(false);
   }
 
@@ -33,9 +31,6 @@ export class SolitaireContextData implements PlayingCardsContextListener {
   }
 
   public isGameOver(): boolean {
-    if (this.debugStates[OSolitaireDebugState.GameOver]) {
-      return true;
-    }
     return this.gameState.gameOver;
   }
 

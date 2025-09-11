@@ -47,6 +47,11 @@ class SolitaireGameState {
     return this.#gameOver;
   }
 
+  _debugSetGameOver() {
+    this.#setGameOver();
+    this.#saveState();
+  }
+
   get elapsedTimeInSeconds() {
     if (this.#gameOver) {
       return this.#gameOverTime;
@@ -113,11 +118,15 @@ class SolitaireGameState {
       (accum, key) => accum && this.isStackValid(key) && !this.hasHiddenCards(key),
       true,
     );
-    this.#gameOver = this.getStock().cards.length === 0 && this.getTalon().cards.length === 0 && areAllTableauCardsShowingFace;
-    if (this.#gameOver) {
-      this.#gameOverTime = this.#computeElapsedTimeInSeconds();
-      registerNewHistoryTime(this.#gameOverTime);
+    if (this.getStock().cards.length === 0 && this.getTalon().cards.length === 0 && areAllTableauCardsShowingFace) {
+      this.#setGameOver();
     }
+  }
+
+  #setGameOver(): void {
+    this.#gameOver = true;
+    this.#gameOverTime = this.#computeElapsedTimeInSeconds();
+    registerNewHistoryTime(this.#gameOverTime);
   }
 
   hasCards(stackId: SolitaireCardStack): boolean {
