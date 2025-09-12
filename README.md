@@ -24,7 +24,7 @@ An exploration in creating a Solitaire game using React.
 
 ## Takeaways
 
-While the state management provided by React allows for a good enough MVVM architecture and made implementing non-game data management (time, leaderboard, stacks) a breeze, in my opninon, managing DOM refreshes across the play session was much more cumbersome. It would be interesting to see if a VDOM-less framework, such as Vue/SolidJS, would be a better option assuming surgical DOM changes simplified some of that complexity.
+While the state management provided by React allows for a good enough MVVM architecture and made implementing non-game data management (time, leaderboard, stacks) a breeze, in my opninon, managing DOM refreshes across the play session was much more cumbersome. It would be interesting to see if a VDOM-less framework, such as SolidJS, would be a better option assuming surgical DOM changes simplified some of that complexity.
 
 ## TODO
 
